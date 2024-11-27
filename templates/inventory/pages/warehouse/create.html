@@ -20,7 +20,7 @@
                 <div class="card-title">Register</div>
             </div>
             <!-- <form class="needs-validation" novalidate> -->
-                <form method="post" data-parsley-validate>
+                <form id="demo-form" method="post" data-parsley-validate>
                 <div class="card-body">
                     {% csrf_token %}
                     <div class="row">
@@ -82,7 +82,7 @@
 
                             <!-- If there are errors for this field, display them -->
                             {% if field.errors %}
-                                <small class="form-text text-danger">{{ field.errors }}</small>
+                                <div><small class="form-text text-danger">{{ field.errors.0 }}</small></div>
                             {% endif %}
     
                             {% if field.help_text %}
@@ -95,7 +95,7 @@
                     </div>
                 </div>
                 <div class="card-action">
-                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button type="button" class="btn btn-success" id="alert_demo_7">Submit</button>	
                     <button class="btn btn-primary" type="reset">Reset</button>
                 </div>
             </form>

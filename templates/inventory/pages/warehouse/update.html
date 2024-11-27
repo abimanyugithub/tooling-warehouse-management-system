@@ -92,9 +92,10 @@
 
                                 <!-- If there are errors for this field, display them -->
                                 {% if field.errors %}
-    <small class="form-text text-danger">{{ field.errors }}</small>
-{% endif %}
-        
+                                <div><small class="form-text text-danger">{{ field.errors.0 }}</small></div>
+                                {% endif %}
+
+
                                 {% if field.help_text %}
                                     <small class="form-text text-muted">{{ field.help_text }}</small>
                                 {% endif %}

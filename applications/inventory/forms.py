@@ -66,8 +66,6 @@ class WarehouseForm(forms.ModelForm):
             # Optionally, add other attributes like autocomplete="off"
             field.widget.attrs.update({'autocomplete': 'off'})
 
-
-
 class ProvinsiForm(forms.ModelForm):
     class Meta:
         model = Provinsi

@@ -52,6 +52,14 @@ class CreateWarehouse(CreateView):
         ]
         return context
     
+    def form_invalid(self, form):
+        # Custom behavior when form is invalid
+        # Add an error message to the Django messages framework
+        messages.error(self.request, "There were errors in your form submission.")
+
+        # Optionally, you can add additional custom context if needed
+        return self.render_to_response(self.get_context_data(form=form))
+    
 class UpdateWarehouse(UpdateView):
     template_name = 'inventory/pages/warehouse/update.html'
     model = Warehouse
@@ -100,10 +108,6 @@ class UpdateWarehouse(UpdateView):
         # Custom behavior when form is invalid
         # Add an error message to the Django messages framework
         messages.error(self.request, "There were errors in your form submission.")
-
-        # Optionally, you can also access and modify other fields.
-        if 'phone_number' not in form.cleaned_data:
-            form.add_error('phone_number', 'phone_number is required!')
 
         # Optionally, you can add additional custom context if needed
         return self.render_to_response(self.get_context_data(form=form))

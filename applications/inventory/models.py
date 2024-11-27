@@ -8,7 +8,7 @@ from applications.mapping.models import Provinsi, KabupatenKota, Kecamatan, Kelu
 # Create your models here.
 class Warehouse(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Unique identifier
-    code = models.CharField(max_length=20)  # unique=True memastikan bahwa tidak ada dua entri
+    code = models.CharField(max_length=20, unique=True)  # unique=True memastikan bahwa tidak ada dua entri
     name = models.CharField(max_length=255) 
     zone = models.CharField(max_length=255)
     # capacity = models.PositiveIntegerField(blank=True, null=True) # Kapasitas maksimum warehouse
@@ -28,15 +28,8 @@ class Warehouse(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True, validators=[RegexValidator(r'^\+?1?\d{9,15}$', "Phone number must be entered in the format: '+6281234567890'. Up to 15 digits allowed.")])
     
     # phone_number = PhoneNumberField(blank=True)
-    def clean(self):
-        # Jika active True, periksa apakah code sudah ada
-        if self.active:
-            if Warehouse.objects.exclude(pk=self.pk).filter(code=self.code, active=True).exists():
-                raise ValidationError(f'The code "{self.code}" must be unique when active.')
-
     def __str__(self):
         return f"{self.code} ({self.name})"
     
-
     class Meta:
         ordering = ['code']

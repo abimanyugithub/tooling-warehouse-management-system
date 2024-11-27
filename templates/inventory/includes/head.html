@@ -34,112 +34,134 @@
 <!-- htmx -->
 <script src="{% static 'inventory/assets/js/htmx.min.js' %}"></script>
 
- <!-- Include Parsley.js CSS -->
- <link rel="stylesheet" href="{% static 'inventory/assets/css/parsley.css' %}">
+<!-- Include Parsley.js CSS -->
+<link rel="stylesheet" href="{% static 'inventory/assets/css/parsley.css' %}">
 
- <!-- Include jQuery -->
- <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<!-- Include jQuery -->
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <script src="{% static 'inventory/assets/js/core/jquery-3.7.1.min.js' %}"></script>
 
- <!-- Include Parsley.js -->
- <script src="{% static 'inventory/assets/js/parsley.min.js' %}"></script>
- <style>
-/* Pre-loader css start */
-.loader-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  z-index: 1035;
-  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
-          box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-.loader-bg .loader-track {
-  position: relative;
-  height: 3px;
-  display: block;
-  width: 100%;
-  overflow: hidden;
-}
-.loader-bg .loader-track .loader-fill:after, .loader-bg .loader-track .loader-fill:before {
-  content: '';
-  background: linear-gradient(-135deg, #1de9b6 0%, #1dc4e9 100%);
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  will-change: left, right;
-}
-.loader-bg .loader-track .loader-fill:before {
-  -webkit-animation: mbar 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
-          animation: mbar 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
-}
-.loader-bg .loader-track .loader-fill:after {
-  -webkit-animation: m_s 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
-          animation: m_s 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
-  -webkit-animation-delay: 1.15s;
-          animation-delay: 1.15s;
-}
+<!-- Include Parsley.js -->
+<script src="{% static 'inventory/assets/js/parsley.min.js' %}"></script>
 
-@-webkit-keyframes mbar {
-  0% {
-    left: -35%;
-    right: 100%;
+<style>
+  * {
+    border: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
-  60% {
-    left: 100%;
-    right: -90%;
+  
+  :root {
+    --c1: #F25961;
+    --c2: #FFAD46;
+    --c3: #31CE36;
+    --c4: #2A2F5B;
+    font-size: calc(16px + (24 - 16) * (100vw - 320px) / (1280 - 320px));
   }
-  100% {
-    left: 100%;
-    right: -35%;
+  
+  /* Pre-loader styles */
+  .loader-bg  {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    flex-direction: column;  /* Stack the bouncing balls and text vertically */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
   }
-}
+  
+  .pl1 {
+    justify-content: space-around;
+  }
+  .pl1__a, .pl1__b, .pl1__c {
+    border-radius: 50%;
+    width: 1em;
+    height: 1em;
+    transform-origin: 50% 100%;
+  }
+  
+  .pl1__a, .pl1__b, .pl1__c {
+    animation: bounce1 1s linear infinite;
+  }
 
-@keyframes mbar {
-  0% {
-    left: -35%;
-    right: 100%;
+  .pl1 {
+    display: flex;
+    margin: 1.5em;
+    width: 6em;
+    height: 6em;
   }
-  60% {
-    left: 100%;
-    right: -90%;
+  
+  .pl1__a, .pl1__b, .pl1__c {
+    border-radius: 50%;
+    width: 1em;
+    height: 1em;
+    transform-origin: 50% 100%;
   }
-  100% {
-    left: 100%;
-    right: -35%;
+  
+  .pl1__a {
+    background: var(--c1);
+    animation: bounce1 1s linear infinite;
   }
-}
-@-webkit-keyframes m_s {
-  0% {
-    left: -200%;
-    right: 100%;
+  
+  .pl1__b {
+    background: var(--c2);
+    animation: bounce1 1s linear infinite;
+    animation-delay: 0.1s;
   }
-  60% {
-    left: 107%;
-    right: -8%;
+  
+  .pl1__c {
+    background: var(--c3);
+    animation: bounce1 1s linear infinite;
+    animation-delay: 0.2s;
   }
-  100% {
-    left: 107%;
-    right: -8%;
+  
+  /* Bounce animation */
+  @keyframes bounce1 {
+    from, to {
+      transform: translateY(0) scale(1, 1);
+      animation-timing-function: ease-in;
+    }
+    45% {
+      transform: translateY(8em) scale(1, 1);  /* Increased bounce distance */
+      animation-timing-function: linear;
+    }
+    50% {
+      transform: translateY(8em) scale(1.5, 0.5);  /* Increased bounce distance */
+      animation-timing-function: linear;
+    }
+    55% {
+      transform: translateY(8em) scale(1, 1);  /* Increased bounce distance */
+      animation-timing-function: ease-out;
+    }
   }
-}
-@keyframes m_s {
-  0% {
-    left: -200%;
-    right: 100%;
+  
+  /* Styling for the text */
+  .loading-text {
+    font-size: 1.2em;
+    color: var(--c4); /* Text color */
+    margin-top: 1em;  /* Add space between the circles and the text */
+    text-align: center;
+    font-weight: bold;
   }
-  60% {
-    left: 107%;
-    right: -8%;
+  
+  /* Dark theme */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17181c;
+      --fg: #e3e4e8;
+    }
   }
-  100% {
-    left: 107%;
-    right: -8%;
+  
+  /* Hide pre-loader after page is loaded */
+  body.loaded .pre-loader {
+    display: none;
   }
-}
-/* Pre-loader css end */
- </style>
+  
+</style>
 
 
