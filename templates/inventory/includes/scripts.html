@@ -31,16 +31,17 @@
 
 <!-- Kaiadmin JS -->
 <script src="{% static 'inventory/assets/js/kaiadmin.min.js' %}"></script>
+
+<!-- pre-loader -->
 <script>
   // Wait for the entire page to load
-  window.onload = function() {
-    // Find the preloader element
-    const loader = document.querySelector('.loader-bg');
-    
-    // Hide the preloader by setting its display to 'none'
-    loader.style.display = 'none';
-  };
+  $(window).on('load', function() {
+      $('.loader-bg').fadeOut('slow', function() {
+      });
+  });
 </script>
+
+
 <script >
   $(document).ready(function() {
     $('#multi-filter-select').DataTable( {
