@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, TemplateView, ListView, UpdateView
+from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView
 from .models import Warehouse, Provinsi, KabupatenKota, Kecamatan, KelurahanDesa
 from .forms import WarehouseForm, ProvinsiForm, KabupatenKotaForm, KecamatanForm, KelurahanDesaForm
 from django.contrib import messages
@@ -27,9 +27,11 @@ class ListWarehouse(ListView):
             'email': 'Email Address',
             'manager': 'Manager'
         }
+
+        context['title'] = self.model.__name__
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': 'Warehouse', 'url': 'warehouse_list'},
+            {'name': f'{self.model.__name__}', 'url': 'warehouse_list'},
             {'name': 'List', 'url': None}  # No URL for the last breadcrumb item
         ]
 
@@ -47,7 +49,7 @@ class CreateWarehouse(CreateView):
         context['disable_fields'] = ['province', 'regency', 'district', 'village']
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': 'Warehouse', 'url': 'warehouse_list'},
+            {'name': f'{self.model.__name__}', 'url': 'warehouse_list'},
             {'name': 'Register', 'url': None}  # No URL for the last breadcrumb item
         ]
         return context
@@ -65,6 +67,7 @@ class UpdateWarehouse(UpdateView):
     model = Warehouse
     form_class = WarehouseForm
     success_url = reverse_lazy('warehouse_list') 
+    context_object_name = 'item'
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -94,8 +97,8 @@ class UpdateWarehouse(UpdateView):
         context['disable_fields'] = ['province', 'regency', 'district', 'village']
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': 'Warehouse', 'url': 'warehouse_list'},
-            {'name': 'Update', 'url': None}  # No URL for the last breadcrumb item
+            {'name': f'{self.model.__name__}', 'url': 'warehouse_list'},
+            {'name': 'Edit', 'url': None}  # No URL for the last breadcrumb item
         ]
         return context
     
@@ -111,6 +114,28 @@ class UpdateWarehouse(UpdateView):
 
         # Optionally, you can add additional custom context if needed
         return self.render_to_response(self.get_context_data(form=form))
+
+class DetailWarehouse(DetailView):
+    model = Warehouse
+    template_name = 'inventory/pages/warehouse/detail.html'
+    context_object_name = 'item'  # This is the object name you'll use in the template
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Initialize the form and add it to the context
+        form = WarehouseForm(instance=self.object)
+        # Menonaktifkan setiap field dalam form
+        for field in form.fields.values():
+            field.disabled = True
+        
+        context['form'] = form
+        context['disable_fields'] = ['province', 'regency', 'district', 'village']
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': f'{self.model.__name__}', 'url': 'warehouse_list'},
+            {'name': 'Detail', 'url': None}  # No URL for the last breadcrumb item
+        ]
+        return context
     
 def get_kabupaten_kota(request):
     provinsi_id = request.GET.get('province')

@@ -5,7 +5,7 @@
 {% block content %}
 <!-- [ Main Content ] start -->
 <div class="page-header">
-    <h3 class="fw-bold mb-3">Warehouse</h3>
+    <h3 class="fw-bold mb-3">{{ title }}</h3>
     <!-- [ breadcrumb ] start -->
     {% block breadcrumbs %}
         {% include 'inventory/includes/breadcrumb.html' %}
@@ -54,11 +54,8 @@
                                 <td>{{ item|get_field_value:field }}</td>
                               {% endfor %}
                               <td>
-                                <a class="btn btn-info btn-sm ml-2" href="{% url 'warehouse_update' pk=item.id %}"><i class="fa fa-pencil"></i> Edit </a>
-                                <form action="" method="post" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button class="btn btn-danger btn-sm {{ obj.button_class }}" type="submit"><i class="fa {{ obj.bi_icon }}"></i><i class="fa fa-trash-o"></i> Delete </button>
-                                </form>
+                                <button class="btn btn-primary btn-sm " onclick="window.location.href='{% url 'warehouse_update' pk=item.id %}'">Edit</button>
+                                <button class="btn btn-info btn-sm " onclick="window.location.href='{% url 'warehouse_detail' pk=item.id %}'">Detail</button>
                               </td>
                             </tr>
                             {% endfor %}

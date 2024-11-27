@@ -1,0 +1,46 @@
+{% extends 'inventory/layouts/base.html' %}
+{% load static custom_filters %}
+
+{% block content %}
+<!-- [ Main Content ] start -->
+<div class="page-header">
+    <h3 class="fw-bold mb-3">Warehouse</h3>
+    <!-- [ breadcrumb ] start -->
+    {% block breadcrumbs %}
+        {% include 'inventory/includes/breadcrumb.html' %}
+    {% endblock breadcrumbs %}
+    <!-- [ breadcrumb ] end -->
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Detail</div>
+            </div>
+                <div class="card-body">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                        {% for field in form %}
+                            {% if forloop.counter0|divisibleby:7 and not forloop.first %}
+                                <!-- Start a new column for every second field -->
+                                </div>
+                                <div class="col-md-6">
+                            {% endif %}
+                            <div class="form-group">
+                                <label>{{ field.label }}</label>
+                                <p>{{ object|get_field_value:field.name }}</p>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            <div class="card-action">
+                <button class="btn btn-primary" onclick="window.location.href='{% url 'warehouse_update' pk=object.id %}'">Edit</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- [ Main Content ] end -->
+{% endblock content %}

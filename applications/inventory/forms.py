@@ -19,6 +19,7 @@ class WarehouseForm(forms.ModelForm):
             'village',
             'phone_number',
             'email',
+            'active'
         ]
 
         labels = {
@@ -33,6 +34,7 @@ class WarehouseForm(forms.ModelForm):
             'regency': 'Regency',
             'district': 'District',
             'village': 'Village',
+            'active':'Mark as active'
         }
 
         help_texts = {
@@ -49,11 +51,12 @@ class WarehouseForm(forms.ModelForm):
             'village': 'Select the village (optional).',
             'phone_number': 'Enter a contact phone number for the warehouse (e.g., +6281234567890) (optional).',
             'email': 'Enter a contact email address for the warehouse (optional).',
+            # 'active': 'Check if this is currently active.',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         # Iterate through each field and set widget attributes
         for field_name, field in self.fields.items():
         
@@ -62,6 +65,10 @@ class WarehouseForm(forms.ModelForm):
                 field.widget.attrs.update({'class': 'form-control parsley-error'})
             else:
                 field.widget.attrs.update({'class': 'form-control'})
+
+            if 'active' in self.fields:
+                # Set widget untuk 'is_active' (misalnya, mengubah checkbox menjadi readonly)
+                self.fields['active'].widget.attrs.update({'class': 'form-check form-check-input'})
             
             # Optionally, add other attributes like autocomplete="off"
             field.widget.attrs.update({'autocomplete': 'off'})
