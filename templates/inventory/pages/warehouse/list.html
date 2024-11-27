@@ -1,0 +1,73 @@
+{% extends 'inventory/layouts/base.html' %}
+{% load static custom_filters %}
+
+
+{% block content %}
+<!-- [ Main Content ] start -->
+<div class="page-header">
+    <h3 class="fw-bold mb-3">Warehouse</h3>
+    <!-- [ breadcrumb ] start -->
+    {% block breadcrumbs %}
+        {% include 'inventory/includes/breadcrumb.html' %}
+    {% endblock breadcrumbs %}
+    <!-- [ breadcrumb ] end -->
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <h4 class="card-title">List</h4>
+                    <button class="btn btn-primary btn-round ms-auto" onclick="window.location.href='{% url 'warehouse_create' %}'">
+                        <i class="fa fa-plus"></i>
+                        Register
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="multi-filter-select" class="display table table-striped table-hover" >
+                        <thead>
+                            <tr>
+                              <th class="mw-25">#</th>
+                              {% for key, value in fields.items %}
+                                <th>{{ value }}</th>
+                              {% endfor %}
+                              <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                            <th class="mw-25">#</th>
+                            {% for key, value in fields.items %}
+                                <th>{{ value }}</th>
+                            {% endfor %}
+                            <th>Action</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            {% for item in list_item %}
+                            <tr>
+                              <td>{{ forloop.counter }}</td>
+                              {% for field in fields %}
+                                <td>{{ item|get_field_value:field }}</td>
+                              {% endfor %}
+                              <td>
+                                <a class="btn btn-info btn-sm ml-2" href="{% url 'warehouse_update' pk=item.id %}"><i class="fa fa-pencil"></i> Edit </a>
+                                <form action="" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger btn-sm {{ obj.button_class }}" type="submit"><i class="fa {{ obj.bi_icon }}"></i><i class="fa fa-trash-o"></i> Delete </button>
+                                </form>
+                              </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- [ Main Content ] end -->
+{% endblock content %}
