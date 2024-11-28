@@ -1,6 +1,6 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View
 from .models import Warehouse, Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, ProductCategory
 from .forms import WarehouseForm, ProvinsiForm, KabupatenKotaForm, KecamatanForm, KelurahanDesaForm, ProductCategoryForm
@@ -66,6 +66,10 @@ class CreateWarehouse(CreateView):
         # Get the previous URL (referrer)
         context['referrer'] = self.request.META.get('HTTP_REFERER', '/')
         return context
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Operation was successful!')
+        return super().form_valid(form)
     
     def form_invalid(self, form):
         # Custom behavior when form is invalid
@@ -196,7 +200,7 @@ def get_kelurahan_desa(request):
         options += f'<option value="{item.id}">{item.name}, {item.postal_code}</option>'
     return HttpResponse(options)
 
-'''
+
 class ListProductCategory(ListView):
     model = ProductCategory
     template_name = 'inventory/pages/product/category/list.html'
@@ -215,19 +219,25 @@ class ListProductCategory(ListView):
         context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': f'{model_name_separated}', 'url': 'prd_category_list'},
+            {'name': f'{model_name_separated}', 'url': 'product_category_list'},
             {'name': 'List', 'url': None}  # No URL for the last breadcrumb item
         ]
 
         return context
-'''
 
+class CreateProductCategory(CreateView):
+    template_name = 'inventory/pages/product/category/create.html'
+    model = ProductCategory
+    form_class = ProductCategoryForm
+    success_url = reverse_lazy('product_category_list') 
+
+'''
 class ViewProductCategory(CreateView, ListView):
     model = ProductCategory
     template_name = 'inventory/pages/product/category/list.html'
     context_object_name = 'list_item'  # Name for the list of books in the context
     form_class = ProductCategoryForm
-    success_url = reverse_lazy('prd_category_list')  
+    success_url = reverse_lazy('product_category_list')  
 
     def get_context_data(self, **kwargs):
         # Get the context data from ListView (for the book list)
@@ -244,7 +254,7 @@ class ViewProductCategory(CreateView, ListView):
         context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': f'{model_name_separated}', 'url': 'prd_category_list'},
+            {'name': f'{model_name_separated}', 'url': 'product_category_list'},
             {'name': 'Register and List', 'url': None}  # No URL for the last breadcrumb item
         ]
         return context
@@ -255,14 +265,14 @@ class ViewProductCategory(CreateView, ListView):
     
     def form_invalid(self, form):
         messages.error(self.request, "There were errors in your form submission.")
-
-        return self.render_to_response(self.get_context_data(form=form))
+        return HttpResponseRedirect(reverse('product_category_list'))
+'''
     
 class UpdateProductCategory(UpdateView):
-    template_name = 'inventory/pages/product/category/update.html'
+    template_name = 'inventory/pages/product/category/create.html'
     model = ProductCategory
     form_class = ProductCategoryForm
-    success_url = reverse_lazy('prd_category_list') 
+    success_url = reverse_lazy('product_category_list') 
     context_object_name = 'item'
 
     def get_context_data(self, **kwargs):
@@ -280,7 +290,7 @@ class UpdateProductCategory(UpdateView):
         context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': f'{model_name_separated}', 'url': 'prd_category_list'},
+            {'name': f'{model_name_separated}', 'url': 'product_category_list'},
             {'name': 'Edit', 'url': None}  # No URL for the last breadcrumb item
         ]
         context['referrer'] = self.request.META.get('HTTP_REFERER', '/')

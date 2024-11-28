@@ -14,15 +14,59 @@
 </div>
 
 <div class="row">
+    <div class="col-md-12"> 
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <h4 class="card-title">Register</h4>
+                    <button class="btn btn-primary btn-round ms-auto" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="true" aria-controls="collapseForm">
+                        <i class="fa fa-plus"></i>
+                        Register
+                    </button>
+                </div>
+            </div>
+
+            <div id="collapseForm" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#collapseForm">
+                <div class="accordion-body">
+                    <form id="post-form" method="post" data-parsley-validate>
+                        <div class="card-body">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                {% for field in form %}
+                                    <div class="form-group">
+                                    {{ field.label_tag }}
+                                    {{ field }}
+                                    <!-- If there are errors for this field, display them -->
+                                    {% if field.errors %}
+                                        <div><small class="form-text text-danger">{{ field.errors.0 }}</small></div>
+                                    {% endif %}
+
+                                    {% if field.help_text %}
+                                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                                    {% endif %}
+                                    </div>
+
+                                {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-action">
+                            <button type="button" class="btn btn-success" id="confirm">Submit</button>	
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
                 <div class="d-flex align-items-center">
                     <h4 class="card-title">List</h4>
-                    <button class="btn btn-primary btn-round ms-auto" onclick="window.location.href='{% url 'product_category_create' %}'">
-                        <i class="fa fa-plus"></i>
-                        Register
-                    </button>
                 </div>
             </div>
             <div class="card-body">

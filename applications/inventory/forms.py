@@ -73,7 +73,7 @@ class WarehouseForm(forms.ModelForm):
 
             if 'code' in self.fields:
                 # Menetapkan nilai acak untuk 'order_number' jika field tersebut ada
-                self.fields['code'].initial = f"WH-{random.randint(1000, 9999)}"
+                self.fields['code'].initial = f"{random.randint(1000, 9999)}"
 
             # Optionally, add other attributes like autocomplete="off"
             field.widget.attrs.update({'autocomplete': 'off'})
@@ -125,5 +125,10 @@ class ProductCategoryForm(forms.ModelForm):
         
         # Iterate through each field and set widget attributes
         for field_name, field in self.fields.items():
-            # Set autocomplete="off" for each field's widget
+            if self.errors.get(field_name):
+                # Add 'is-invalid' class to fields with errors
+                field.widget.attrs.update({'class': 'form-control parsley-error'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
+
             field.widget.attrs.update({'autocomplete': 'off'})
