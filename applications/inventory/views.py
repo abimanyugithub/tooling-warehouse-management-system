@@ -1,7 +1,7 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView
+from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View
 from .models import Warehouse, Provinsi, KabupatenKota, Kecamatan, KelurahanDesa
 from .forms import WarehouseForm, ProvinsiForm, KabupatenKotaForm, KecamatanForm, KelurahanDesaForm
 from django.contrib import messages
@@ -16,6 +16,9 @@ class ListWarehouse(ListView):
     template_name = 'inventory/pages/warehouse/list.html'
     context_object_name = 'list_item'
     ordering = ['code']
+
+    def get_queryset(self):
+        return Warehouse.get_active()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -52,6 +55,8 @@ class CreateWarehouse(CreateView):
             {'name': f'{self.model.__name__}', 'url': 'warehouse_list'},
             {'name': 'Register', 'url': None}  # No URL for the last breadcrumb item
         ]
+        # Get the previous URL (referrer)
+        context['referrer'] = self.request.META.get('HTTP_REFERER', '/')
         return context
     
     def form_invalid(self, form):
@@ -100,6 +105,8 @@ class UpdateWarehouse(UpdateView):
             {'name': f'{self.model.__name__}', 'url': 'warehouse_list'},
             {'name': 'Edit', 'url': None}  # No URL for the last breadcrumb item
         ]
+        # Get the previous URL (referrer)
+        context['referrer'] = self.request.META.get('HTTP_REFERER', '/')
         return context
     
     def form_valid(self, form):
@@ -135,7 +142,23 @@ class DetailWarehouse(DetailView):
             {'name': f'{self.model.__name__}', 'url': 'warehouse_list'},
             {'name': 'Detail', 'url': None}  # No URL for the last breadcrumb item
         ]
+        context['referrer'] = self.request.META.get('HTTP_REFERER', '/')
         return context
+    
+class SoftDeleteWarehouse(View):
+    def post(self, request, pk):
+        item = get_object_or_404(Warehouse, pk=pk)
+        item.soft_delete()  # Soft delete the item
+        messages.success(request, 'The item has been successfully deleted.')
+
+        return redirect('warehouse_list')
+'''
+class RestoreItemView(View):
+    def post(self, request, pk):
+        item = get_object_or_404(Item, pk=pk)
+        item.restore()  # Restore the soft deleted item
+        return redirect('trash_list')
+'''
     
 def get_kabupaten_kota(request):
     provinsi_id = request.GET.get('province')

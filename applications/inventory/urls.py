@@ -7,6 +7,7 @@ urlpatterns = [
     path('inventory/warehouse/update/<uuid:pk>', views.UpdateWarehouse.as_view(), name='warehouse_update'),
     path('inventory/warehouse/list', views.ListWarehouse.as_view(), name='warehouse_list'),
     path('inventory/warehouse/detail/<uuid:pk>', views.DetailWarehouse.as_view(), name='warehouse_detail'),
+    path('inventory/warehouse/delete/<uuid:pk>/', views.SoftDeleteWarehouse.as_view(), name='warehouse_delete'),
 
     path('kabupaten-kota/', views.get_kabupaten_kota, name='get_kabupaten_kota'),
     path('kecamatan/', views.get_kecamatan, name='get_kecamatan'),

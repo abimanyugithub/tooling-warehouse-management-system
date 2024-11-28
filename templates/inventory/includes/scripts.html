@@ -40,8 +40,9 @@
       });
   });
 </script>
+<!-- end pre-loader -->
 
-
+<!-- datatables -->
 <script >
   $(document).ready(function() {
     $('#multi-filter-select').DataTable( {
@@ -69,7 +70,9 @@
     });
   });
 </script>
+<!-- datatables -->
 
+<!-- alert SweetAlert -->
 {% if messages %}
 <script>
   // Loop through messages and display them using SweetAlert
@@ -91,14 +94,14 @@
   {% endfor %}
 </script>
 {% endif %}
+<!-- end alert SweetAlert -->
 
+<!-- confirm SweetAlert -->
 <script>
-  $('#alert_demo_7').click(function(e) {
-    e.preventDefault();  // Prevent default action (if it's a link or form)
-  
+  function showSweetAlert(title, text) {
     swal({
-      title: 'Confirm action?',
-      text: "The changes will be saved.",
+      title: title,
+      text: text,
       icon: 'warning',
       buttons: {
         confirm: {
@@ -110,91 +113,39 @@
           className: 'btn btn-danger'
         }
       }
-    }).then(function(Delete) {
-      if (Delete) {
-        // Trigger the delete action here, like submitting a form or making an AJAX call
-        // For example, if you're using a form:
-        $('#demo-form').submit();  // Replace with your form ID
-  
-        // If you want to make an AJAX request instead:
-        /*
-        $.ajax({
-          url: '/delete-file', // Your delete endpoint
-          method: 'POST',
-          data: { file_id: yourFileId },  // Data to be sent
-          success: function(response) {
-            console.log('File deleted successfully');
-          },
-          error: function(error) {
-            console.log('Error deleting file');
-          }
-        });
-        */
+    }).then(function(Confirm) {
+      if (Confirm) {
+        // Add your form submission logic or AJAX call here
+        // For example:
+        $('#post-form').submit();  // Trigger the post form submission
       } else {
-        swal.close();  // Close the SweetAlert if the user clicks "Cancel"
+        swal.close();  // Close the SweetAlert if canceled
       }
     });
-  });
-  </script>
-  
+  }
 
-{% comment %}
-<script>
-  $('#alert_demo_7').click(function(e) {
-    e.preventDefault();  // Prevent default action (if it's a link or form)
-  
-    swal({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      buttons: {
-        confirm: {
-          text: 'Yes, delete it!',
-          className: 'btn btn-success'
-        },
-        cancel: {
-          visible: true,
-          className: 'btn btn-danger'
-        }
-      }
-    }).then((Delete) => {
-      if (Delete) {
-        swal({
-          title: 'Deleted!',
-          text: 'Your file has been deleted.',
-          icon: 'success',
-          buttons: {
-            confirm: {
-              className: 'btn btn-success'
-            }
-          }
-        }).then(() => {
-          // Trigger the delete action here, like submitting a form or making an AJAX call
-          // For example, if you're using a form:
-          $('#demo-form').submit();  // Replace with your form ID
-          
-          // If you want to make an AJAX request instead:
-          /*
-          $.ajax({
-            url: '/delete-file', // Your delete endpoint
-            method: 'POST',
-            data: { file_id: yourFileId },  // Data to be sent
-            success: function(response) {
-              console.log('File deleted successfully');
-            },
-            error: function(error) {
-              console.log('Error deleting file');
-            }
-          });
-          */
-        });
-      } else {
-        swal.close();
-      }
-    });
+  // Confirm action for #post-form
+  $('#confirm').click(function(e) {
+    e.preventDefault();
+    showSweetAlert('Confirm action?', 'The changes will be saved.');
+  });
+
+  // Delete action for #post-form (using same form)
+  $('#delete').click(function(e) {
+    e.preventDefault();
+    showSweetAlert('Are you sure?', 'This item will be moved to the trash.');
   });
 </script>
-{% endcomment %}
+<!-- end confirm SweetAlert -->
+
+<!-- tooltips -->
+<script>
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+</script>
+<!-- endtooltips -->
   
 
 

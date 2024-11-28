@@ -20,7 +20,7 @@
                 <div class="card-title">Register</div>
             </div>
             <!-- <form class="needs-validation" novalidate> -->
-                <form id="demo-form" method="post" data-parsley-validate>
+            <form id="post-form" method="post" data-parsley-validate>
                 <div class="card-body">
                     {% csrf_token %}
                     <div class="row">
@@ -95,8 +95,8 @@
                     </div>
                 </div>
                 <div class="card-action">
-                    <button type="button" class="btn btn-success" id="alert_demo_7">Submit</button>	
-                    <button class="btn btn-primary" type="reset">Reset</button>
+                    <button type="button" class="btn btn-success" id="confirm">Submit</button>	
+                    <button class="btn btn-primary" type="button" onclick="window.location.href='{{ referrer }}'">Back</button>
                 </div>
             </form>
         </div>

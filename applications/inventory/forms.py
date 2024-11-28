@@ -1,6 +1,7 @@
 from django import forms
 from django.urls import reverse
 from .models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, Warehouse
+import random
 
 class WarehouseForm(forms.ModelForm):
     class Meta:
@@ -67,9 +68,13 @@ class WarehouseForm(forms.ModelForm):
                 field.widget.attrs.update({'class': 'form-control'})
 
             if 'active' in self.fields:
-                # Set widget untuk 'is_active' (misalnya, mengubah checkbox menjadi readonly)
+                # Set widget untuk 'active' (misalnya, mengubah checkbox menjadi readonly)
                 self.fields['active'].widget.attrs.update({'class': 'form-check form-check-input'})
-            
+
+            if 'code' in self.fields:
+                # Menetapkan nilai acak untuk 'order_number' jika field tersebut ada
+                self.fields['code'].initial = f"WH-{random.randint(1000, 9999)}"
+
             # Optionally, add other attributes like autocomplete="off"
             field.widget.attrs.update({'autocomplete': 'off'})
 

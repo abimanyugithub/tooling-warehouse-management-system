@@ -16,10 +16,16 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Edit</div>
+                <div class="d-flex align-items-center">
+                    <h4 class="card-title">Edit</h4>
+                    <button class="btn btn-primary btn-round ms-auto" onclick="window.location.href='{% url 'warehouse_create' %}'">
+                        <i class="fa fa-plus"></i>
+                        Register
+                    </button> 
+                </div>
             </div>
                 <!-- <form class="needs-validation" novalidate> -->
-                <form id="demo-form" method="post" data-parsley-validate>
+                <form id="post-form" method="post" data-parsley-validate>
                     <div class="card-body">
                         {% csrf_token %}
                         <div class="row">
@@ -106,9 +112,8 @@
                         </div>
                     </div>
                 <div class="card-action">
-                    <button type="button" class="btn btn-success" id="alert_demo_7">Submit</button>	
-                    {% comment %}<button type="submit" class="btn btn-success" id="submit-button">Submit</button>{% endcomment %}
-                    <button class="btn btn-primary" type="reset">Reset</button>
+                    <button type="button" class="btn btn-success" id="confirm">Submit</button>	
+                    <button class="btn btn-primary" type="button" onclick="window.location.href='{{ referrer }}'">Back</button>
                 </div>
             </form>
         </div>

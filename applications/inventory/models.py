@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator, MinValueValidator
 from django.forms import ValidationError
 from applications.mapping.models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa
 # from phonenumber_field.modelfields import PhoneNumberField
+from django.utils import timezone
 
 # Create your models here.
 class Warehouse(models.Model):
@@ -26,11 +27,27 @@ class Warehouse(models.Model):
     village = models.ForeignKey(KelurahanDesa, on_delete=models.CASCADE, blank=True, null=True)
     email = models.EmailField(max_length=254, blank=True, null=True, verbose_name='Alamat Email')
     phone_number = models.CharField(max_length=15, blank=True, null=True, validators=[RegexValidator(r'^\+?1?\d{9,15}$', "Phone number must be entered in the format: '+6281234567890'. Up to 15 digits allowed.")])
-    
+    deleted_at = models.DateTimeField(null=True, blank=True) # Tracks soft delete timestamp
+
     # phone_number = PhoneNumberField(blank=True)
     def __str__(self):
         return f"{self.code} ({self.name})"
     
+    def soft_delete(self):
+        self.deleted_at = timezone.now()  # Set waktu penghapusan
+        self.save()
+
+    def restore(self):
+        self.deleted_at = None  # Menghapus waktu penghapusan
+        self.save()
+
+    @classmethod
+    def get_active(cls):
+        return cls.objects.filter(deleted_at__isnull=True)  # Hanya ambil item yang tidak memiliki waktu penghapusan
+
+    @classmethod
+    def get_trash(cls):
+        return cls.objects.filter(deleted_at__isnull=False)  # Hanya ambil item yang sudah dihapus
     
     class Meta:
         ordering = ['code']
