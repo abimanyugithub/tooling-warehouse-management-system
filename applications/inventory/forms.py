@@ -1,6 +1,6 @@
 from django import forms
 from django.urls import reverse
-from .models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, Warehouse
+from .models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, Warehouse, ProductCategory
 import random
 
 class WarehouseForm(forms.ModelForm):
@@ -26,7 +26,7 @@ class WarehouseForm(forms.ModelForm):
         labels = {
             'code': 'Warehouse Code *',
             'name': 'Warehouse Name *',
-            'zone': 'Zone *',
+            'zone': 'Area *',
             'address_line1': 'Address Line 1',
             'address_line2': 'Address Line 2',
             'phone_number': 'Phone Number',
@@ -41,7 +41,7 @@ class WarehouseForm(forms.ModelForm):
         help_texts = {
             'code': 'A unique code for this warehouse (up to 20 characters).',
             'name': 'Enter the full name of the warehouse.',
-            'zone': 'Provide a general description of the zone within or near the warehouse, e.g., "Zone A".',
+            'zone': 'Provide a general description of the area within or near the warehouse, e.g., "Zone A".',
             'capacity': 'Enter the maximum storage capacity of this warehouse, e.g., in cubic meters (m³) (optional).',
             'manager': 'Enter the full name of the warehouse manager (optional).',
             'address_line1': 'Enter the primary street address (optional).',
@@ -97,3 +97,33 @@ class KelurahanDesaForm(forms.ModelForm):
     class Meta:
         model = KelurahanDesa
         fields = ['kecamatan', 'name', 'id_code', 'postal_code']
+
+
+class ProductCategoryForm(forms.ModelForm):
+
+    class Meta:
+        model = ProductCategory
+        fields = [
+            'name',
+            'description',
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
+        help_texts = {
+            'name': 'Enter the name of the product category.',
+            'description': 'Provide a detailed description of the category (optional).',
+        }
+
+        labels = {
+            'name': 'Category Name *',
+        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Iterate through each field and set widget attributes
+        for field_name, field in self.fields.items():
+            # Set autocomplete="off" for each field's widget
+            field.widget.attrs.update({'autocomplete': 'off'})

@@ -2,10 +2,16 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View
-from .models import Warehouse, Provinsi, KabupatenKota, Kecamatan, KelurahanDesa
-from .forms import WarehouseForm, ProvinsiForm, KabupatenKotaForm, KecamatanForm, KelurahanDesaForm
+from .models import Warehouse, Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, ProductCategory
+from .forms import WarehouseForm, ProvinsiForm, KabupatenKotaForm, KecamatanForm, KelurahanDesaForm, ProductCategoryForm
 from django.contrib import messages
+import re
 
+
+# Fungsi untuk memisahkan nama model
+def get_separated_model_name(model_name):
+    separated = re.findall('[A-Z][^A-Z]*', model_name)
+    return ' '.join(separated)
 
 # Create your views here.
 class DashboardView(TemplateView):
@@ -22,19 +28,19 @@ class ListWarehouse(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        model_name_separated = get_separated_model_name(self.model.__name__)
         context['fields'] = {
             'code': 'Warehouse Code',
             'name': 'Warehouse Name',
-            'zone': 'Zone',
+            'zone': 'Area',
             'phone_number': 'Phone Number',
             'email': 'Email Address',
             'manager': 'Manager'
         }
-
-        context['title'] = self.model.__name__
+        context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': f'{self.model.__name__}', 'url': 'warehouse_list'},
+            {'name': f'{model_name_separated}', 'url': 'warehouse_list'},
             {'name': 'List', 'url': None}  # No URL for the last breadcrumb item
         ]
 
@@ -48,11 +54,13 @@ class CreateWarehouse(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        model_name_separated = get_separated_model_name(self.model.__name__)
         # Initialize the form and add it to the context
         context['disable_fields'] = ['province', 'regency', 'district', 'village']
+        context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': f'{self.model.__name__}', 'url': 'warehouse_list'},
+            {'name': f'{model_name_separated}', 'url': 'warehouse_list'},
             {'name': 'Register', 'url': None}  # No URL for the last breadcrumb item
         ]
         # Get the previous URL (referrer)
@@ -98,11 +106,13 @@ class UpdateWarehouse(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        model_name_separated = get_separated_model_name(self.model.__name__)
         # Initialize the form and add it to the context
         context['disable_fields'] = ['province', 'regency', 'district', 'village']
+        context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': f'{self.model.__name__}', 'url': 'warehouse_list'},
+            {'name': f'{model_name_separated}', 'url': 'warehouse_list'},
             {'name': 'Edit', 'url': None}  # No URL for the last breadcrumb item
         ]
         # Get the previous URL (referrer)
@@ -129,6 +139,7 @@ class DetailWarehouse(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        model_name_separated = get_separated_model_name(self.model.__name__)
         # Initialize the form and add it to the context
         form = WarehouseForm(instance=self.object)
         # Menonaktifkan setiap field dalam form
@@ -137,9 +148,10 @@ class DetailWarehouse(DetailView):
         
         context['form'] = form
         context['disable_fields'] = ['province', 'regency', 'district', 'village']
+        context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': f'{self.model.__name__}', 'url': 'warehouse_list'},
+            {'name': f'{model_name_separated}', 'url': 'warehouse_list'},
             {'name': 'Detail', 'url': None}  # No URL for the last breadcrumb item
         ]
         context['referrer'] = self.request.META.get('HTTP_REFERER', '/')
@@ -184,4 +196,102 @@ def get_kelurahan_desa(request):
         options += f'<option value="{item.id}">{item.name}, {item.postal_code}</option>'
     return HttpResponse(options)
 
+'''
+class ListProductCategory(ListView):
+    model = ProductCategory
+    template_name = 'inventory/pages/product/category/list.html'
+    context_object_name = 'list_item'
+    ordering = ['name']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        separated = re.findall('[A-Z][^A-Z]*', self.model.__name__)
+        model_name_separated = ' '.join(separated)
+        context['fields'] = {
+            'name': 'Category Name',
+            'description': 'Description',
+        }
+
+        context['title'] = model_name_separated
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': f'{model_name_separated}', 'url': 'prd_category_list'},
+            {'name': 'List', 'url': None}  # No URL for the last breadcrumb item
+        ]
+
+        return context
+'''
+
+class ViewProductCategory(CreateView, ListView):
+    model = ProductCategory
+    template_name = 'inventory/pages/product/category/list.html'
+    context_object_name = 'list_item'  # Name for the list of books in the context
+    form_class = ProductCategoryForm
+    success_url = reverse_lazy('prd_category_list')  
+
+    def get_context_data(self, **kwargs):
+        # Get the context data from ListView (for the book list)
+        context = super().get_context_data(**kwargs)
+        # Add the form to the context for the CreateView (form to add a new book)
+        context['form'] = self.get_form()
+        separated = re.findall('[A-Z][^A-Z]*', self.model.__name__)
+        model_name_separated = ' '.join(separated)
+        context['fields'] = {
+            'name': 'Category Name',
+            'description': 'Description',
+        }
+
+        context['title'] = model_name_separated
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': f'{model_name_separated}', 'url': 'prd_category_list'},
+            {'name': 'Register and List', 'url': None}  # No URL for the last breadcrumb item
+        ]
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Operation was successful!')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, "There were errors in your form submission.")
+
+        return self.render_to_response(self.get_context_data(form=form))
+    
+class UpdateProductCategory(UpdateView):
+    template_name = 'inventory/pages/product/category/update.html'
+    model = ProductCategory
+    form_class = ProductCategoryForm
+    success_url = reverse_lazy('prd_category_list') 
+    context_object_name = 'item'
+
+    def get_context_data(self, **kwargs):
+        # Get the context data from ListView (for the book list)
+        context = super().get_context_data(**kwargs)
+        # Add the form to the context for the CreateView (form to add a new book)
+        context['form'] = self.get_form()
+        separated = re.findall('[A-Z][^A-Z]*', self.model.__name__)
+        model_name_separated = ' '.join(separated)
+        context['fields'] = {
+            'name': 'Category Name',
+            'description': 'Description',
+        }
+
+        context['title'] = model_name_separated
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': f'{model_name_separated}', 'url': 'prd_category_list'},
+            {'name': 'Edit', 'url': None}  # No URL for the last breadcrumb item
+        ]
+        context['referrer'] = self.request.META.get('HTTP_REFERER', '/')
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Operation was successful!')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, "There were errors in your form submission.")
+
+        return self.render_to_response(self.get_context_data(form=form))
 

@@ -53,35 +53,45 @@
         <li class="nav-item">
           <a data-bs-toggle="collapse" href="#base">
             <i class="fas fa-layer-group"></i>
-            <p>Inventories</p>
+            <p>Master Data</p>
             <span class="caret"></span>
           </a>
           <div class="collapse" id="base">
             <ul class="nav nav-collapse">
               <li>
-                <a data-bs-toggle="collapse" href="#subnav1">
+                <a href="{% url 'warehouse_list' %}">
                   <span class="sub-item">Warehouse</span>
+                </a>
+              </li>
+              <li>
+                <a data-bs-toggle="collapse" href="#subnav1">
+                  <span class="sub-item">Product</span>
                   <span class="caret"></span>
                 </a>
                 <div class="collapse" id="subnav1">
                   <ul class="nav nav-collapse subnav">
                     <li>
-                      <a href="#">
-                        <span class="sub-item">Area</span>
+                      <a href="{% url 'prd_category_list' %}">
+                        <span class="sub-item">Category</span>
                       </a>
                     </li>
                     <li>
-                      <a href="{% url 'warehouse_list' %}">
-                        <span class="sub-item">Warehouse</span>
+                      <a href="#">
+                        <span class="sub-item">UOM</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <span class="sub-item">Product Type</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <span class="sub-item">Product</span>
                       </a>
                     </li>
                   </ul>
                 </div>
-              </li>
-              <li>
-                <a href="components/avatars.html">
-                  <span class="sub-item">Products</span>
-                </a>
               </li>
             </ul>
           </div>
