@@ -32,63 +32,60 @@
                                 <div class="col-md-6">
                             {% endif %}
                             <div class="form-group">
-                            {% if field.name not in disable_fields %}
                                 {{ field.label_tag }}
-                                {{ field }}
-                            {% endif %}
-    
-                            {% if field.name == 'province' %}
-                                {{ field.label_tag }}
-                                <select class="form-control form-select" 
-                                        id="province" 
-                                        name="{{ field.name }}"
-                                        hx-get="{% url 'get_kabupaten_kota' %}" 
-                                        hx-target="#regency-dropdown" 
-                                        hx-trigger="change"
-                                        >
-                                    <option value="">Select Province</option>
-                                    {% for provinsi in form.province.field.queryset %}
-                                        <option value="{{ provinsi.id }}" {% if provinsi.id == form.instance.province.id %}selected{% endif %}>{{ provinsi.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            {% elif field.name == 'regency' %}
-                                {{ field.label_tag }}
-                                <select class="form-control form-select" 
-                                        id="regency-dropdown" 
-                                        name="{{ field.name }}" 
-                                        hx-get="{% url 'get_kecamatan' %}" 
-                                        hx-target="#district-dropdown" 
-                                        hx-trigger="change">
-                                    <option value="">Select Regency/City</option>
-                                </select>
-                            {% elif field.name == 'district' %}
-                                {{ field.label_tag }}
-                                <select class="form-control form-select" 
-                                        id="district-dropdown" 
-                                        name="{{ field.name }}" 
-                                        hx-get="{% url 'get_kelurahan_desa' %}" 
-                                        hx-target="#village-dropdown" 
-                                        hx-trigger="change">
-                                    <option value="">Select District</option>
-                                </select>
-                            {% elif field.name == 'village' %}
-                                {{ field.label_tag }}
-                                <select class="form-control form-select" 
-                                        id="village-dropdown" 
-                                        name="{{ field.name }}">
-                                    <option value="">Select Village/Subdistrict</option>
-                                </select>
-                            {% endif %}
+                                {% if field.name == 'province' %}
+                                    {{ field.label_tag }}
+                                    <select class="form-control form-select" 
+                                            id="province" 
+                                            name="{{ field.name }}"
+                                            hx-get="{% url 'get_kabupaten_kota' %}" 
+                                            hx-target="#regency-dropdown" 
+                                            hx-trigger="change"
+                                            >
+                                        <option value="">Select Province</option>
+                                        {% for provinsi in form.province.field.queryset %}
+                                            <option value="{{ provinsi.id }}" {% if provinsi.id == form.instance.province.id %}selected{% endif %}>{{ provinsi.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% elif field.name == 'regency' %}
+                                    {{ field.label_tag }}
+                                    <select class="form-control form-select" 
+                                            id="regency-dropdown" 
+                                            name="{{ field.name }}" 
+                                            hx-get="{% url 'get_kecamatan' %}" 
+                                            hx-target="#district-dropdown" 
+                                            hx-trigger="change">
+                                        <option value="">Select Regency/City</option>
+                                    </select>
+                                {% elif field.name == 'district' %}
+                                    {{ field.label_tag }}
+                                    <select class="form-control form-select" 
+                                            id="district-dropdown" 
+                                            name="{{ field.name }}" 
+                                            hx-get="{% url 'get_kelurahan_desa' %}" 
+                                            hx-target="#village-dropdown" 
+                                            hx-trigger="change">
+                                        <option value="">Select District</option>
+                                    </select>
+                                {% elif field.name == 'village' %}
+                                    {{ field.label_tag }}
+                                    <select class="form-control form-select" 
+                                            id="village-dropdown" 
+                                            name="{{ field.name }}">
+                                        <option value="">Select Village/Subdistrict</option>
+                                    </select>
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
 
-                            <!-- If there are errors for this field, display them -->
-                            {% if field.errors %}
-                                <div><small class="form-text text-danger">{{ field.errors.0 }}</small></div>
-                            {% endif %}
-    
-                            {% if field.help_text %}
-                                <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
-
+                                <!-- If there are errors for this field, display them -->
+                                {% if field.errors %}
+                                    <div><small class="form-text text-danger">{{ field.errors.0 }}</small></div>
+                                {% endif %}
+        
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
                             </div>
                             {% endfor %}
                         </div>
@@ -96,7 +93,7 @@
                 </div>
                 <div class="card-action">
                     <button type="button" class="btn btn-success" id="confirm">Submit</button>	
-                    <button class="btn btn-primary" type="button" onclick="window.location.href='{{ referrer }}'">Back</button>
+                    <button class="btn btn-primary" type="button" onclick="window.history.back();">Back</button>
                 </div>
             </form>
         </div>

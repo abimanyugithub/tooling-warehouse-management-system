@@ -1,6 +1,6 @@
 from django import forms
 from django.urls import reverse
-from .models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, Warehouse, ProductCategory
+from .models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, Warehouse, ProductCategory, ProductUOM
 import random
 
 class WarehouseForm(forms.ModelForm):
@@ -120,6 +120,47 @@ class ProductCategoryForm(forms.ModelForm):
         labels = {
             'name': 'Category Name *',
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Iterate through each field and set widget attributes
+        for field_name, field in self.fields.items():
+            if self.errors.get(field_name):
+                # Add 'is-invalid' class to fields with errors
+                field.widget.attrs.update({'class': 'form-control parsley-error'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
+
+            field.widget.attrs.update({'autocomplete': 'off'})
+
+class ProductUOMForm(forms.ModelForm):
+
+    class Meta:
+        model = ProductUOM
+        fields = [
+            'name',
+            'code',
+            'description',
+        ]
+
+        labels = {
+            'name': 'UOM Name *',
+            'code': 'UOM Code *',
+        }
+        
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+            'code': forms.TextInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+            'description': forms.Textarea(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+        }
+
+        help_texts = {
+            'name': 'Enter the name of the unit of measurement (e.g., Kilogram, Liter, Meter). This should be unique.',
+            'description': 'Provide a detailed description of the unit of measurement (optional). This can include the usage or details about the unit.',
+            'code': 'Enter the unit’s code (e.g., kg for kilogram, l for liter). This will be used for shorthand representation.',
+        }
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         

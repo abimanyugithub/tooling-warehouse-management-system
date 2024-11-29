@@ -17,7 +17,7 @@
         <div class="card">
             <div class="card-header">
                 <div class="d-flex align-items-center">
-                    <h4 class="card-title">{{ subtitle }}</h4>
+                    <h4 class="card-title">Edit</h4>
                 </div>
             </div>
             <form id="post-form" method="post" data-parsley-validate>
@@ -45,7 +45,7 @@
                 </div>
                 <div class="card-action">
                     <button type="button" class="btn btn-success" id="confirm">Submit</button>
-                    <button class="btn btn-primary" type="button" onclick="window.history.back();">Back</button>
+                    <button class="btn btn-primary" type="button" onclick="window.location.href='{{ referrer }}'">Back</button>
                 </div>
             </form>
         </div>

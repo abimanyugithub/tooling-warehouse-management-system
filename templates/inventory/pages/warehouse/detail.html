@@ -30,7 +30,6 @@
                 </div>
             </div>
                 <div class="card-body">
-                    {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6">
                         {% for field in form %}
@@ -40,8 +39,19 @@
                                 <div class="col-md-6">
                             {% endif %}
                             <div class="form-group">
-                                <label>{{ field.label }}</label>
-                                <p>{{ object|get_field_value:field.name }}</p>
+                                {{ field.label_tag }}
+                                {% if field.name == "regency" %}
+                                    <!-- Read-only input for regency -->
+                                    <input type="text" name="regency" id="id_regency" class="form-control" value="{{ object.regency.name }}" readonly>
+                                {% elif field.name == "district" %}
+                                    <!-- Read-only input for district -->
+                                    <input type="text" name="district" id="id_district" class="form-control" value="{{ object.district.name }}" readonly>
+                                {% elif field.name == "village" %}
+                                    <!-- Read-only input for village -->
+                                    <input type="text" name="village" id="id_village" class="form-control" value="{{ object.village.name }}" readonly>
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
                             </div>
                         {% endfor %}
                         </div>
@@ -49,7 +59,7 @@
                 </div>
             <div class="card-action">
                 <button class="btn btn-warning" onclick="window.location.href='{% url 'warehouse_update' pk=object.id %}'">Edit</button>
-                <button class="btn btn-primary" type="button" onclick="window.location.href='{{ referrer }}'">Back</button>
+                <button class="btn btn-primary" type="button" onclick="window.history.back();">Back</button>
             </div>
         </div>
     </div>
