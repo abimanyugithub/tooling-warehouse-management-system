@@ -1,6 +1,6 @@
 from django import forms
 from django.urls import reverse
-from .models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, Warehouse, ProductCategory, ProductUOM
+from .models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, Warehouse, ProductCategory, ProductUOM, ProductType
 import random
 
 class WarehouseForm(forms.ModelForm):
@@ -100,7 +100,6 @@ class KelurahanDesaForm(forms.ModelForm):
 
 
 class ProductCategoryForm(forms.ModelForm):
-
     class Meta:
         model = ProductCategory
         fields = [
@@ -135,7 +134,6 @@ class ProductCategoryForm(forms.ModelForm):
             field.widget.attrs.update({'autocomplete': 'off'})
 
 class ProductUOMForm(forms.ModelForm):
-
     class Meta:
         model = ProductUOM
         fields = [
@@ -150,9 +148,9 @@ class ProductUOMForm(forms.ModelForm):
         }
         
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
-            'code': forms.TextInput(attrs={'class': 'form-control col-md-7 col-xs-12'}),
-            'description': forms.Textarea(attrs={'class': 'form-control col-md-7 col-xs-12'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'code': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
         }
 
         help_texts = {
@@ -161,6 +159,44 @@ class ProductUOMForm(forms.ModelForm):
             'code': 'Enter the unit’s code (e.g., kg for kilogram, l for liter). This will be used for shorthand representation.',
         }
         
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Iterate through each field and set widget attributes
+        for field_name, field in self.fields.items():
+            if self.errors.get(field_name):
+                # Add 'is-invalid' class to fields with errors
+                field.widget.attrs.update({'class': 'form-control parsley-error'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
+
+            field.widget.attrs.update({'autocomplete': 'off'})
+
+class ProductTypeForm(forms.ModelForm):
+    class Meta:
+        model = ProductType
+        fields = [
+            'name',
+            'code',
+            'description',
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'code': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
+        help_texts = {
+            'name': 'Enter a unique name for the product type (e.g., Raw Materials, Finished Goods).',
+            'code': 'Enter a code for the product type (e.g., "RM" for Raw Materials, "FG" for Finished Goods)',
+            'description': 'Provide an optional description of the product type.',
+        }
+
+        labels = {
+            'name': 'Product Type Name *',
+            'code': 'Product Type Code *',
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         

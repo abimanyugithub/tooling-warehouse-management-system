@@ -2,8 +2,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View
-from .models import Warehouse, Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, ProductCategory, ProductUOM
-from .forms import WarehouseForm, ProvinsiForm, KabupatenKotaForm, KecamatanForm, KelurahanDesaForm, ProductCategoryForm, ProductUOMForm
+from .models import Warehouse, Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, ProductCategory, ProductUOM, ProductType
+from .forms import WarehouseForm, ProvinsiForm, KabupatenKotaForm, KecamatanForm, KelurahanDesaForm, ProductCategoryForm, ProductUOMForm, ProductTypeForm
 from django.contrib import messages
 import re
 
@@ -150,8 +150,7 @@ class DetailWarehouse(DetailView):
         for field in form.fields.values():
             field.disabled = True
         
-        context['form'] = form
-        
+        context['form'] = form     
         context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
@@ -254,11 +253,6 @@ class CreateProductCategory(CreateView):
         # Get the context data from ListView (for the book list)
         context = super().get_context_data(**kwargs)
         model_name_separated = get_separated_model_name(self.model.__name__)
-        context['fields'] = {
-            'name': 'Category Name',
-            'description': 'Description',
-        }
-
         context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
@@ -326,11 +320,6 @@ class UpdateProductCategory(UpdateView):
         # Get the context data from ListView (for the book list)
         context = super().get_context_data(**kwargs)
         model_name_separated = get_separated_model_name(self.model.__name__)
-        context['fields'] = {
-            'name': 'Category Name',
-            'description': 'Description',
-        }
-
         context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
@@ -365,7 +354,6 @@ class DetailProductCategory(DetailView):
             field.disabled = True
         
         context['form'] = form
-        
         context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
@@ -385,8 +373,8 @@ class ListProductUOM(ListView):
         context = super().get_context_data(**kwargs)
         model_name_separated = get_separated_model_name(self.model.__name__)
         context['fields'] = {
-            'name': 'UoM Code',
-            'code': 'UoM Name',
+            'name': 'UoM Name',
+            'code': 'UoM Code',
             'description': 'Description',
         }
 
@@ -409,11 +397,6 @@ class CreateProductUOM(CreateView):
         # Get the context data from ListView (for the book list)
         context = super().get_context_data(**kwargs)
         model_name_separated = get_separated_model_name(self.model.__name__)
-        context['fields'] = {
-            'name': 'Category Name',
-            'description': 'Description',
-        }
-
         context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
@@ -443,11 +426,6 @@ class UpdateProductUOM(UpdateView):
         # Get the context data from ListView (for the book list)
         context = super().get_context_data(**kwargs)
         model_name_separated = get_separated_model_name(self.model.__name__)
-        context['fields'] = {
-            'name': 'Category Name',
-            'description': 'Description',
-        }
-
         context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
@@ -482,13 +460,117 @@ class DetailProductUOM(DetailView):
             field.disabled = True
         
         context['form'] = form
-        
         context['title'] = model_name_separated
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': f'{model_name_separated}', 'url': 'product_category_list'},
+            {'name': f'{model_name_separated}', 'url': 'product_uom_list'},
             {'name': 'Detail', 'url': None}  # No URL for the last breadcrumb item
         ]
         
         return context
 
+class ListProductType(ListView):
+    model = ProductType
+    template_name = 'inventory/pages/product/type/list.html'
+    context_object_name = 'list_item'
+    ordering = ['name']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        model_name_separated = get_separated_model_name(self.model.__name__)
+        context['fields'] = {
+            'name': 'Type Name',
+            'code': 'Type Code',
+            'description': 'Description',
+        }
+
+        context['title'] = model_name_separated
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': f'{model_name_separated}', 'url': 'product_type_list'},
+            {'name': 'List', 'url': None}  # No URL for the last breadcrumb item
+        ]
+
+        return context
+    
+class CreateProductType(CreateView):
+    template_name = 'inventory/pages/product/type/create.html'
+    model = ProductType
+    form_class = ProductTypeForm
+    success_url = reverse_lazy('product_type_list')
+
+    def get_context_data(self, **kwargs):
+        # Get the context data from ListView (for the book list)
+        context = super().get_context_data(**kwargs)
+        model_name_separated = get_separated_model_name(self.model.__name__)
+        context['title'] = model_name_separated
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': f'{model_name_separated}', 'url': 'product_type_list'},
+            {'name': 'Register', 'url': None}  # No URL for the last breadcrumb item
+        ]
+        
+        context['subtitle'] = 'Register'
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Operation was successful!')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, "There were errors in your form submission.")
+
+        return self.render_to_response(self.get_context_data(form=form))
+    
+class DetailProductType(DetailView):
+    model = ProductType
+    template_name = 'inventory/pages/product/type/detail.html'
+    context_object_name = 'item'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        model_name_separated = get_separated_model_name(self.model.__name__)
+        # Initialize the form and add it to the context
+        form = ProductTypeForm(instance=self.object)
+        # Menonaktifkan setiap field dalam form
+        for field in form.fields.values():
+            field.disabled = True
+        
+        context['form'] = form
+        context['title'] = model_name_separated
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': f'{model_name_separated}', 'url': 'product_type_list'},
+            {'name': 'Detail', 'url': None}  # No URL for the last breadcrumb item
+        ]
+        
+        return context
+    
+class UpdateProductType(UpdateView):
+    template_name = 'inventory/pages/product/category/create.html'
+    model = ProductType
+    form_class = ProductTypeForm
+    success_url = reverse_lazy('product_type_list')
+
+    def get_context_data(self, **kwargs):
+        # Get the context data from ListView (for the book list)
+        context = super().get_context_data(**kwargs)
+        model_name_separated = get_separated_model_name(self.model.__name__)
+        context['title'] = model_name_separated
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': f'{model_name_separated}', 'url': 'product_uom_list'},
+            {'name': 'Register', 'url': None}  # No URL for the last breadcrumb item
+        ]
+        
+        context['subtitle'] = 'Edit'
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Operation was successful!')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, "There were errors in your form submission.")
+
+        return self.render_to_response(self.get_context_data(form=form))
