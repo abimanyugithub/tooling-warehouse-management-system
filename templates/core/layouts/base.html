@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{% comment %}
+{% load i18n static admin_datta %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+{% get_direction as direction %}
+{% get_admin_setting as admin_setting %}
+{% endcomment %}
+<html lang="en">
+
+<head>
+  {% include 'core/includes/head.html' %}
+  {% block extrastyle %}{% endblock extrastyle %}
+  {% block extrahead %}{% endblock extrahead %}
+</head>
+<body>
+  
+  {% block pre_loader %}
+    {% include 'core/includes/pre-loader.html' %}
+  {% endblock pre_loader %}
+
+  <div class="wrapper">
+    {% block sidebar %}
+      {% include 'core/includes/sidebar.html' %}
+    {% endblock sidebar %}
+    <div class="main-panel">
+
+
+      <!-- [ header ] start -->
+      {% block header %}
+        {% include 'core/includes/navigation.html' %}
+      {% endblock header %}
+      <!-- [ header ] end -->
+    
+      <div class="container">
+        <div class="page-inner">
+        {% block content %}{% endblock content %}
+        </div>
+      </div>
+
+      <!-- [ footer ] start -->
+      {% block footer %}
+        {% include 'core/includes/footer.html' %}
+      {% endblock footer %}
+      <!-- [ footer ] end -->
+    </div>
+  </div>
+
+  {% include 'core/includes/scripts.html' %}
+  {% block extra_js %}{% endblock extra_js %}
+
+</body>
+</html>

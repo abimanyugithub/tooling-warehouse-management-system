@@ -1,0 +1,68 @@
+{% extends 'core/layouts/base.html' %}
+{% load static custom_filters %}
+
+{% block content %}
+<!-- [ Main Content ] start -->
+<div class="page-header">
+    <h3 class="fw-bold mb-3">{{ title }}</h3>
+    <!-- [ breadcrumb ] start -->
+    {% block breadcrumbs %}
+        {% include 'core/includes/breadcrumb.html' %}
+    {% endblock breadcrumbs %}
+    <!-- [ breadcrumb ] end -->
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <h4 class="card-title">Detail</h4>
+                    <button class="btn btn-primary btn-round ms-auto me-1" onclick="window.location.href='{% url 'warehouse_create' %}'">
+                        <i class="fa fa-plus"></i>
+                        Register
+                    </button>
+                    <form id="post-form" method="post" action="{% url 'warehouse_delete' pk=item.id %}">
+                        {% csrf_token %}
+                        <button data-bs-toggle="tooltip" title="Move to trash" type="button" class="btn btn-danger btn-round ms-auto" id="delete">
+                            <i class="icon-trash"></i></button>
+                    </form>
+                </div>
+            </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                        {% for field in form %}
+                            {% if forloop.counter0|divisibleby:7 and not forloop.first %}
+                                <!-- Start a new column for every second field -->
+                                </div>
+                                <div class="col-md-6">
+                            {% endif %}
+                            <div class="form-group">
+                                {{ field.label_tag }}
+                                {% if field.name == "regency" %}
+                                    <!-- Read-only input for regency -->
+                                    <input type="text" name="regency" id="id_regency" class="form-control" value="{{ object.regency.name }}" readonly>
+                                {% elif field.name == "district" %}
+                                    <!-- Read-only input for district -->
+                                    <input type="text" name="district" id="id_district" class="form-control" value="{{ object.district.name }}" readonly>
+                                {% elif field.name == "village" %}
+                                    <!-- Read-only input for village -->
+                                    <input type="text" name="village" id="id_village" class="form-control" value="{{ object.village.name }}" readonly>
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            <div class="card-action">
+                <button class="btn btn-warning" onclick="window.location.href='{% url 'warehouse_update' pk=object.id %}'">Edit</button>
+                <button class="btn btn-primary" type="button" onclick="window.history.back();">Back</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- [ Main Content ] end -->
+{% endblock content %}

@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'applications.inventory',
+    'applications.core',
     'applications.mapping',
     # 'phonenumber_field',
 ]
@@ -68,7 +68,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
             'libraries': { 
-                'custom_filters': 'applications.inventory.templatetags.custom_filters'
+                'custom_filters': 'applications.core.templatetags.custom_filters'
             }
         },
     },

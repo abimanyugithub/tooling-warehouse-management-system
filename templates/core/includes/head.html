@@ -1,0 +1,166 @@
+{% load static %}
+
+<title>Kaiadmin - Bootstrap 5 Admin Dashboard</title>
+<!-- HTML5 Shim and Respond.js IE11 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 11]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<!-- Meta -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+<link rel="icon" href="{% static 'core/assets/img/kaiadmin/favicon.ico' %}" type="image/x-icon"/>
+
+<!-- Fonts and icons -->
+<script src="{% static 'core/assets/js/plugin/webfont/webfont.min.js' %}"></script>
+<script>
+      WebFont.load({
+            google: {"families":["Public Sans:300,400,500,600,700"]},
+            custom: {"families":["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ["{% static 'core/assets/css/fonts.min.css' %}"]},
+            active: function() {
+                  sessionStorage.fonts = true;
+            }
+      });
+</script>
+
+<!-- CSS Files -->
+<link rel="stylesheet" href="{% static 'core/assets/css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="{% static 'core/assets/css/plugins.min.css' %}">
+<link rel="stylesheet" href="{% static 'core/assets/css/kaiadmin.min.css' %}">
+
+<!-- htmx -->
+<script src="{% static 'core/assets/js/htmx.min.js' %}"></script>
+
+<!-- Include Parsley.js CSS -->
+<link rel="stylesheet" href="{% static 'core/assets/css/parsley.css' %}">
+
+<!-- Include jQuery -->
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<script src="{% static 'core/assets/js/core/jquery-3.7.1.min.js' %}"></script>
+
+<!-- Include Parsley.js -->
+<script src="{% static 'core/assets/js/parsley.min.js' %}"></script>
+
+<!-- pre-loader -->
+<style>
+  * {
+    border: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  :root {
+    --c1: #F25961;
+    --c2: #FFAD46;
+    --c3: #31CE36;
+    --c4: #2A2F5B;
+    font-size: calc(16px + (24 - 16) * (100vw - 320px) / (1280 - 320px));
+  }
+  
+  /* Pre-loader styles */
+  .loader-bg  {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* background-color: rgba(255, 255, 255, 0.7); */
+    background-color: white;
+    display: flex;
+    flex-direction: column;  /* Stack the bouncing balls and text vertically */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  
+  .pl1 {
+    justify-content: space-around;
+  }
+  .pl1__a, .pl1__b, .pl1__c {
+    border-radius: 50%;
+    width: 1em;
+    height: 1em;
+    transform-origin: 50% 100%;
+  }
+  
+  .pl1__a, .pl1__b, .pl1__c {
+    animation: bounce1 1s linear infinite;
+  }
+
+  .pl1 {
+    display: flex;
+    margin: 1.5em;
+    width: 6em;
+    height: 6em;
+  }
+  
+  .pl1__a, .pl1__b, .pl1__c {
+    border-radius: 50%;
+    width: 1em;
+    height: 1em;
+    transform-origin: 50% 100%;
+  }
+  
+  .pl1__a {
+    background: var(--c1);
+    animation: bounce1 1s linear infinite;
+  }
+  
+  .pl1__b {
+    background: var(--c2);
+    animation: bounce1 1s linear infinite;
+    animation-delay: 0.1s;
+  }
+  
+  .pl1__c {
+    background: var(--c3);
+    animation: bounce1 1s linear infinite;
+    animation-delay: 0.2s;
+  }
+  
+  /* Bounce animation */
+  @keyframes bounce1 {
+    from, to {
+      transform: translateY(0) scale(1, 1);
+      animation-timing-function: ease-in;
+    }
+    45% {
+      transform: translateY(8em) scale(1, 1);  /* Increased bounce distance */
+      animation-timing-function: linear;
+    }
+    50% {
+      transform: translateY(8em) scale(1.5, 0.5);  /* Increased bounce distance */
+      animation-timing-function: linear;
+    }
+    55% {
+      transform: translateY(8em) scale(1, 1);  /* Increased bounce distance */
+      animation-timing-function: ease-out;
+    }
+  }
+  
+  /* Styling for the text */
+  .loading-text {
+    font-size: 1.2em;
+    color: var(--c4); /* Text color */
+    margin-top: 1em;  /* Add space between the circles and the text */
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  /* Dark theme */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17181c;
+      --fg: #e3e4e8;
+    }
+  }
+  
+  /* Hide pre-loader after page is loaded */
+  body.loaded .pre-loader {
+    display: none;
+  }
+</style>

@@ -1,0 +1,121 @@
+{% extends 'core/layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- [ Main Content ] start -->
+<div class="page-header">
+    <h3 class="fw-bold mb-3">{{ title }}</h3>
+    <!-- [ breadcrumb ] start -->
+    {% block breadcrumbs %}
+        {% include 'core/includes/breadcrumb.html' %}
+    {% endblock breadcrumbs %}
+    <!-- [ breadcrumb ] end -->
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <h4 class="card-title">Edit</h4>
+                    <button class="btn btn-primary btn-round ms-auto" onclick="window.location.href='{% url 'warehouse_create' %}'">
+                        <i class="fa fa-plus"></i>
+                        Register
+                    </button> 
+                </div>
+            </div>
+                <!-- <form class="needs-validation" novalidate> -->
+                <form id="post-form" method="post" data-parsley-validate>
+                    <div class="card-body">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                            {% for field in form %}
+                                {% if forloop.counter0|divisibleby:7 and not forloop.first %}
+                                    <!-- Start a new column for every second field -->
+                                    </div>
+                                    <div class="col-md-6">
+                                {% endif %}
+                                <div class="form-group">
+                                    {{ field.label_tag }}
+                                    {% if field.name == 'province' %}
+                                        {{ field.label_tag }}
+                                        <select class="form-control form-select"
+                                            id="province" 
+                                            name="{{ field.name }}"
+                                            hx-get="{% url 'get_kabupaten_kota' %}" 
+                                            hx-target="#regency-dropdown" 
+                                            hx-trigger="change">
+                                            <option value="">Select Province</option>
+                                            {% for provinsi in form.province.field.queryset %}
+                                                <option value="{{ provinsi.id }}" {% if provinsi.id == form.instance.province.id %}selected{% endif %}>{{ provinsi.name }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                    {% elif field.name == 'regency' %}
+                                        {{ field.label_tag }}
+                                        <select class="form-control form-select" 
+                                            id="regency-dropdown" 
+                                            name="{{ field.name }}" 
+                                            hx-get="{% url 'get_kecamatan' %}" 
+                                            hx-target="#district-dropdown" 
+                                            hx-trigger="change">
+                                            <option value="">Select Regency/City</option>
+                                            {% for regency in form.regency.field.queryset %}
+                                                <option value="{{ regency.id }}" {% if regency.id == form.instance.regency.id %}selected{% endif %}>{{ regency.name }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                    {% elif field.name == 'district' %}
+                                        {{ field.label_tag }}
+                                        <select class="form-control form-select" 
+                                            id="district-dropdown" 
+                                            name="{{ field.name }}" 
+                                            hx-get="{% url 'get_kelurahan_desa' %}" 
+                                            hx-target="#village-dropdown" 
+                                            hx-trigger="change">
+                                            <option value="">Select District</option>
+                                            {% for district in form.district.field.queryset %}
+                                                <option value="{{ district.id }}" {% if district.id == form.instance.district.id %}selected{% endif %}>{{ district.name }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                    {% elif field.name == 'village' %}
+                                        {{ field.label_tag }}
+                                        <select class="form-control form-select" 
+                                            id="village-dropdown" 
+                                            name="{{ field.name }}">
+                                            <option value="">Select Village/Subdistrict</option>
+                                            {% for village in form.village.field.queryset %}
+                                                <option value="{{ village.id }}" {% if village.id == form.instance.village.id %}selected{% endif %}>{{ village.name }}, {{ village.postal_code }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% else %}
+                                        {{ field }}
+                                    {% endif %}
+
+                                    <!-- If there are errors for this field, display them -->
+                                    {% if field.errors %}
+                                    <div><small class="form-text text-danger">{{ field.errors.0 }}</small></div>
+                                    {% endif %}
+
+
+                                    {% if field.help_text %}
+                                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                                    {% endif %}
+
+                                </div>
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                <div class="card-action">
+                    <button type="button" class="btn btn-success" id="confirm">Submit</button>	
+                    <button class="btn btn-primary" type="button" onclick="window.history.back();">Back</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- [ Main Content ] end -->
+{% endblock content %}
