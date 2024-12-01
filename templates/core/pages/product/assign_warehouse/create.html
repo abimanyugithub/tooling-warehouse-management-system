@@ -1,0 +1,21 @@
+<!-- templates/create_warehouse_product.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Warehouse Product</title>
+</head>
+<body>
+    <h1>Create Warehouse Product</h1>
+    <form method="GET">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create WarehouseProduct</button>
+    </form>
+
+    {% if search_query %}
+        <p>Search Query: {{ search_query }}</p>
+    {% endif %}
+</body>
+</html>

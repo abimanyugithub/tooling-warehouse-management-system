@@ -109,12 +109,12 @@ class Product(models.Model):
     # price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     stock_quantity = models.PositiveIntegerField(default=0)
     # suppliers = models.ManyToManyField(Supplier, related_name='products')  # Many-to-many relationship
-    uom = models.ForeignKey(ProductUOM, on_delete=models.CASCADE, related_name='products')
-    product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE, related_name='products')
+    uom = models.ForeignKey(ProductUOM, on_delete=models.CASCADE)
+    product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE)
     sku = models.CharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE, related_name='products')
+    category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE,)
     deleted_at = models.DateTimeField(null=True, blank=True) # Tracks soft delete timestamp
 
     '''def generate_sku(self):
@@ -132,3 +132,8 @@ class Product(models.Model):
     
     class Meta:
         ordering = ['sku']
+
+
+class WarehouseProduct(models.Model):
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)

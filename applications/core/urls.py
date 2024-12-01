@@ -2,6 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('kabupaten-kota/', views.get_kabupaten_kota, name='get_kabupaten_kota'),
+    path('kecamatan/', views.get_kecamatan, name='get_kecamatan'),
+    path('kelurahan-desa/', views.get_kelurahan_desa, name='get_kelurahan_desa'),
+
     path('', views.DashboardView.as_view(), name='dashboard_view'),
     path('core/warehouse/create/', views.CreateWarehouse.as_view(), name='warehouse_create'),
     path('core/warehouse/update/<uuid:pk>/', views.UpdateWarehouse.as_view(), name='warehouse_update'),
@@ -30,8 +34,6 @@ urlpatterns = [
     path('core/product/update/<uuid:pk>/', views.UpdateProduct.as_view(), name='product_update'),
     path('core/product/detail/<uuid:pk>/', views.DetailProduct.as_view(), name='product_detail'),
 
-    path('kabupaten-kota/', views.get_kabupaten_kota, name='get_kabupaten_kota'),
-    path('kecamatan/', views.get_kecamatan, name='get_kecamatan'),
-    path('kelurahan-desa/', views.get_kelurahan_desa, name='get_kelurahan_desa'),
-    
+    path('core/inventory/warehouse/', views.ListInventoryWarehouse.as_view(), name='inventory_wh_view'),
+    path('core/product/warehouse-product/search', views.WarehouseProductSearchView.as_view(), name='warehouse_product_query'),
 ]

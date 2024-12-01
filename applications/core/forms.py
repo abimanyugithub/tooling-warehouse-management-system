@@ -266,3 +266,38 @@ class ProductForm(forms.ModelForm):
 
             # Optionally, add other attributes like autocomplete="off"
             field.widget.attrs.update({'autocomplete': 'off'})
+
+
+class WarehouseProductSearchForm(forms.Form):
+    q = forms.CharField(
+        label='Search',
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        help_text='Enter the product name or description to search for.' 
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Iterate through each field and set widget attributes
+        for field_name, field in self.fields.items():
+        
+            field.widget.attrs.update({'autocomplete': 'off'})
+
+
+'''class WarehouseProductSearchForm(forms.Form):
+    warehouse = forms.ModelChoiceField(queryset=Warehouse.objects.all(), required=True, label="Select Warehouse")
+    query = forms.CharField(required=False, label="Search Product", widget=forms.TextInput(attrs={'placeholder': 'Search for products...'}))
+    product = forms.ModelChoiceField(queryset=Product.objects.none(), required=True, label="Select Product")
+
+    def __init__(self, *args, **kwargs):
+        search_query = kwargs.pop('search_query', None)
+        super().__init__(*args, **kwargs)
+        
+        # Filter the product queryset if a search query is provided
+        if search_query:
+            self.fields['product'].queryset = Product.objects.filter(name__icontains=search_query)'''
+
+
+   

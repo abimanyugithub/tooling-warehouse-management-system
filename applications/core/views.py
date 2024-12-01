@@ -1,9 +1,12 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View
-from .models import Warehouse, KabupatenKota, Kecamatan, KelurahanDesa, ProductCategory, ProductUOM, ProductType, Product
+from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View, FormView
+from .models import Warehouse, KabupatenKota, Kecamatan, KelurahanDesa
+from .models import ProductCategory, ProductUOM, ProductType, Product, WarehouseProduct
+
 from .forms import WarehouseForm, ProductCategoryForm, ProductUOMForm, ProductTypeForm, ProductForm
+from .forms import WarehouseProductSearchForm
 import re
 from django.contrib import messages
 
@@ -682,3 +685,74 @@ class DetailProduct(DetailView):
         ]
         
         return context
+    
+    
+class WarehouseProductSearchView(TemplateView):
+    template_name = 'core/pages/product/assign_warehouse/query.html'
+    model = WarehouseProduct
+
+    def get_context_data(self, **kwargs):
+        # Get the context data from ListView (for the book list)
+        context = super().get_context_data(**kwargs)
+        form = WarehouseProductSearchForm(self.request.GET or None)
+        context['form'] = form
+
+        model_name_separated = get_separated_model_name(self.model.__name__)
+        context['title'] = model_name_separated
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': f'{model_name_separated}', 'url': 'warehouse_product_query'},
+            {'name': 'Register', 'url': None}  # No URL for the last breadcrumb item
+        ]
+        
+        context['subtitle'] = 'Register'
+        return context
+
+class CreateWarehouseProduct(CreateView):
+    template_name = 'core/pages/product/assign_warehouse/create.html'
+    model = WarehouseProduct
+    # form_class = WarehouseForm
+    fields = ['warehouse', 'product']
+    success_url = reverse_lazy('warehouse_list') 
+
+    
+class ListInventoryWarehouse(TemplateView):
+    template_name = 'core/pages/inventory/view.html'
+
+
+'''
+class WarehouseProductSearchView(FormView):
+    template_name = 'core/pages/product/assign_warehouse/create.html'
+    form_class = WarehouseProductSearchForm
+    success_url = reverse_lazy('success')  # You can replace 'success' with the URL of your choice
+
+    def get_initial(self):
+        # Prepopulate the form with the search query if available
+        initial = super().get_initial()
+        search_query = self.request.GET.get('query', '')
+        initial['query'] = search_query
+        return initial
+
+    def get_context_data(self, **kwargs):
+        # Get the context data from the superclass
+        context = super().get_context_data(**kwargs)
+        
+        # Get the search query from the GET request to filter products
+        search_query = self.request.GET.get('query', '')
+
+        # Pass the search query to the form to filter the products
+        context['search_query'] = search_query
+
+        return context
+
+    def form_valid(self, form):
+        # Get the cleaned data from the form
+        warehouse = form.cleaned_data['warehouse']
+        product = form.cleaned_data['product']
+
+        # Create the WarehouseProduct entry
+        WarehouseProduct.objects.create(warehouse=warehouse, product=product)
+
+        # Redirect to a success page or another view
+        return HttpResponseRedirect(self.success_url)
+'''

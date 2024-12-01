@@ -66,6 +66,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'applications.core.context_processors.navbar_context', 
             ],
             'libraries': { 
                 'custom_filters': 'applications.core.templatetags.custom_filters'
