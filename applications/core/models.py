@@ -128,7 +128,7 @@ class Product(models.Model):
         super(Product, self).save(*args, **kwargs)'''
 
     def __str__(self):
-        return self.name
+        return f"{self.sku} ({self.name})"
     
     class Meta:
         ordering = ['sku']

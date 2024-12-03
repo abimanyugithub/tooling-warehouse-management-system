@@ -1,6 +1,7 @@
 from django import forms
 from django.urls import reverse
-from .models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa, Warehouse, ProductCategory, ProductUOM, ProductType, Product
+from .models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa
+from .models import Warehouse, ProductCategory, ProductUOM, ProductType, Product, WarehouseProduct
 import random
 
 class WarehouseForm(forms.ModelForm):
@@ -274,7 +275,7 @@ class WarehouseProductSearchForm(forms.Form):
         max_length=100,
         required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'}),
-        help_text='Enter the product name or description to search for.' 
+        help_text='Enter product number or name to search.' 
     )
 
     def __init__(self, *args, **kwargs):
@@ -282,22 +283,39 @@ class WarehouseProductSearchForm(forms.Form):
 
         # Iterate through each field and set widget attributes
         for field_name, field in self.fields.items():
-        
             field.widget.attrs.update({'autocomplete': 'off'})
 
 
-'''class WarehouseProductSearchForm(forms.Form):
-    warehouse = forms.ModelChoiceField(queryset=Warehouse.objects.all(), required=True, label="Select Warehouse")
-    query = forms.CharField(required=False, label="Search Product", widget=forms.TextInput(attrs={'placeholder': 'Search for products...'}))
-    product = forms.ModelChoiceField(queryset=Product.objects.none(), required=True, label="Select Product")
+
+class WarehouseProductForm(forms.ModelForm):
+    class Meta:
+        model = WarehouseProduct
+        fields = ['product', 'warehouse']  # The fields we want to include in the form
+
+        widgets = {
+            'product': forms.Select(attrs={'class': 'form-control'}),  # We use HiddenInput so the user can't change it
+            'warehouse': forms.Select(attrs={'class': 'form-control form-select'}),
+        }
 
     def __init__(self, *args, **kwargs):
-        search_query = kwargs.pop('search_query', None)
+        # Extract the product_instance from kwargs, passed in the view
+        self.product_instance = kwargs.pop('product_instance', None)
         super().__init__(*args, **kwargs)
-        
-        # Filter the product queryset if a search query is provided
-        if search_query:
-            self.fields['product'].queryset = Product.objects.filter(name__icontains=search_query)'''
+
+        if self.product_instance:
+            # Set the product field to the passed product_instance (this will be pre-filled in the form)
+            self.fields['product'].initial = self.product_instance
+
+    def save(self, commit=True):
+        # Override the save method to explicitly assign the product
+        warehouse_product = super().save(commit=False)
+        warehouse_product.product = self.product_instance  # Assign the product instance passed from the view
+
+        if commit:
+            warehouse_product.save()
+
+        return warehouse_product
+    
 
 
    

@@ -1,12 +1,14 @@
-from django.http import HttpResponse, HttpResponseRedirect
+import uuid
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View, FormView
 from .models import Warehouse, KabupatenKota, Kecamatan, KelurahanDesa
 from .models import ProductCategory, ProductUOM, ProductType, Product, WarehouseProduct
+from django.db.models import Q
 
 from .forms import WarehouseForm, ProductCategoryForm, ProductUOMForm, ProductTypeForm, ProductForm
-from .forms import WarehouseProductSearchForm
+from .forms import WarehouseProductSearchForm, WarehouseProductForm
 import re
 from django.contrib import messages
 
@@ -686,73 +688,94 @@ class DetailProduct(DetailView):
         
         return context
     
-    
-class WarehouseProductSearchView(TemplateView):
+class WarehouseProductSearchView(ListView):
+    model = Product
     template_name = 'core/pages/product/assign_warehouse/query.html'
-    model = WarehouseProduct
-
+    context_object_name = 'list_item'
+    form_class = WarehouseProductSearchForm
+    paginate_by = 100
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        query = self.request.GET.get('q')
+        if query:
+           queryset = queryset.filter(
+                Q(name__icontains=query) | Q(sku__icontains=query)
+            )
+        return queryset
+    
     def get_context_data(self, **kwargs):
-        # Get the context data from ListView (for the book list)
         context = super().get_context_data(**kwargs)
-        form = WarehouseProductSearchForm(self.request.GET or None)
-        context['form'] = form
+        context['form'] = self.form_class(self.request.GET)
+        context['query'] = self.request.GET.get('q', '')
+        context['fields'] = {
+            'sku': 'Product No.',
+            'name': 'Product Name',
+            'category': 'Category',
+            'product_type': 'Type',
+            'uom': 'UOM',
+        }
 
-        model_name_separated = get_separated_model_name(self.model.__name__)
-        context['title'] = model_name_separated
+        context['title'] = 'Assign Product'
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': f'{model_name_separated}', 'url': 'warehouse_product_query'},
+            {'name': 'Assign Product', 'url': 'warehouse_product_query'},
+            {'name': 'Query', 'url': None}  # No URL for the last breadcrumb item
+        ]
+
+        context['subtitle'] = 'Register'
+        return context
+
+class CreateWarehouseProduct(DetailView):
+    template_name = 'core/pages/product/assign_warehouse/create.html'
+    model = Product
+    context_object_name = 'item'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Fetch the product instance based on the pk in the URL
+        product_instance = self.get_object()
+        
+        # Initialize the form and pass the product instance to it
+        form = WarehouseProductForm(self.request.GET or None, product_instance=product_instance)
+        context['form'] = form
+        context['title'] = 'Assign Product'
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': 'Assign Product', 'url': 'warehouse_product_query'},
             {'name': 'Register', 'url': None}  # No URL for the last breadcrumb item
         ]
         
         context['subtitle'] = 'Register'
+
+        # Show only certain fields for regular users
+        dynamic_fields = {
+            'Product No': self.object.sku,
+            'Product Name': self.object.name,
+            'Category': self.object.category,
+            'Type': self.object.product_type,
+            'UOM': self.object.uom,
+        }
+
+        context['dynamic_fields'] = dynamic_fields
         return context
-
-class CreateWarehouseProduct(CreateView):
-    template_name = 'core/pages/product/assign_warehouse/create.html'
-    model = WarehouseProduct
-    # form_class = WarehouseForm
-    fields = ['warehouse', 'product']
-    success_url = reverse_lazy('warehouse_list') 
-
     
+    def post(self, request, *args, **kwargs):
+        product_instance = self.get_object()  # Get the product instance based on pk in URL
+
+        # Initialize the form with the POST data and product instance
+        form = WarehouseProductForm(request.POST, product_instance=product_instance)
+
+        if form.is_valid():
+            # Save the form and create the WarehouseProduct
+            form.save()
+
+            # Redirect to the success URL
+            return redirect(reverse_lazy('warehouse_list'))  # Adjust the success URL as needed
+
+        # If form is invalid, re-render the same page with form errors
+        return self.render_to_response(self.get_context_data(form=form))
+
 class ListInventoryWarehouse(TemplateView):
     template_name = 'core/pages/inventory/view.html'
-
-
-'''
-class WarehouseProductSearchView(FormView):
-    template_name = 'core/pages/product/assign_warehouse/create.html'
-    form_class = WarehouseProductSearchForm
-    success_url = reverse_lazy('success')  # You can replace 'success' with the URL of your choice
-
-    def get_initial(self):
-        # Prepopulate the form with the search query if available
-        initial = super().get_initial()
-        search_query = self.request.GET.get('query', '')
-        initial['query'] = search_query
-        return initial
-
-    def get_context_data(self, **kwargs):
-        # Get the context data from the superclass
-        context = super().get_context_data(**kwargs)
-        
-        # Get the search query from the GET request to filter products
-        search_query = self.request.GET.get('query', '')
-
-        # Pass the search query to the form to filter the products
-        context['search_query'] = search_query
-
-        return context
-
-    def form_valid(self, form):
-        # Get the cleaned data from the form
-        warehouse = form.cleaned_data['warehouse']
-        product = form.cleaned_data['product']
-
-        # Create the WarehouseProduct entry
-        WarehouseProduct.objects.create(warehouse=warehouse, product=product)
-
-        # Redirect to a success page or another view
-        return HttpResponseRedirect(self.success_url)
-'''
