@@ -28,7 +28,8 @@ class ListWarehouse(ListView):
     ordering = ['code']
 
     def get_queryset(self):
-        return Warehouse.get_active()
+        # Filter untuk hanya menampilkan item yang belum dihapus
+        return Warehouse.objects.filter(deleted_at__isnull=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -690,7 +691,7 @@ class DetailProduct(DetailView):
     
 class WarehouseProductSearchView(ListView):
     model = Product
-    template_name = 'core/pages/product/assign_warehouse/query.html'
+    template_name = 'core/pages/inventory/assign_warehouse/query.html'
     context_object_name = 'list_item'
     form_class = WarehouseProductSearchForm
     paginate_by = 100
@@ -706,6 +707,7 @@ class WarehouseProductSearchView(ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        warehouse_instance = get_object_or_404(Warehouse, pk=self.kwargs.get('wh'))
         context['form'] = self.form_class(self.request.GET)
         context['query'] = self.request.GET.get('q', '')
         context['fields'] = {
@@ -716,18 +718,20 @@ class WarehouseProductSearchView(ListView):
             'uom': 'UOM',
         }
 
-        context['title'] = 'Assign Product'
+        context['title'] = f'Assign Product'
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': 'Assign Product', 'url': 'warehouse_product_query'},
-            {'name': 'Query', 'url': None}  # No URL for the last breadcrumb item
+            # {'name': 'Assign Product', 'url': reverse ('warehouse_product_query', kwargs={'wh': warehouse_instance.id})},
+            {'name': 'Assign Product', 'url': None},
+            {'name': f'Register to {warehouse_instance}', 'url': None}
         ]
 
         context['subtitle'] = 'Register'
+        context['warehouse_id'] = warehouse_instance.id
         return context
-
+    
 class CreateWarehouseProduct(DetailView):
-    template_name = 'core/pages/product/assign_warehouse/create.html'
+    template_name = 'core/pages/inventory/assign_warehouse/create.html'
     model = Product
     context_object_name = 'item'
 
@@ -736,21 +740,27 @@ class CreateWarehouseProduct(DetailView):
         
         # Fetch the product instance based on the pk in the URL
         product_instance = self.get_object()
+        # Get the warehouse instance from the URL parameters ('wh')
+        warehouse_instance = get_object_or_404(Warehouse, pk=self.kwargs.get('wh'))
         
         # Initialize the form and pass the product instance to it
-        form = WarehouseProductForm(self.request.GET or None, product_instance=product_instance)
+        form = WarehouseProductForm(self.request.GET or None, product_instance=product_instance, warehouse_instance=warehouse_instance)
         context['form'] = form
         context['title'] = 'Assign Product'
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
-            {'name': 'Assign Product', 'url': 'warehouse_product_query'},
-            {'name': 'Register', 'url': None}  # No URL for the last breadcrumb item
+            # {'name': 'Assign Product', 'url': 'warehouse_product_query'},
+            {'name': 'Assign Product', 'url': None},
+            {'name': f'Register to {warehouse_instance}', 'url': None}
         ]
         
         context['subtitle'] = 'Register'
-
+        status = WarehouseProduct.objects.filter(product=product_instance, warehouse=warehouse_instance)
         # Show only certain fields for regular users
         dynamic_fields = {
+            'Status': f'Registered' if status.exists() else 'Not registered.',
+            'Warehouse': f'{warehouse_instance}' if status.exists() else '--',
+            'Registered Date': status.first().created_at.strftime('%d/%m/%Y %H:%M') if status.exists() and status.first().created_at else '--',
             'Product No': self.object.sku,
             'Product Name': self.object.name,
             'Category': self.object.category,
@@ -759,23 +769,27 @@ class CreateWarehouseProduct(DetailView):
         }
 
         context['dynamic_fields'] = dynamic_fields
+        context['button_submit'] = f'<button type="button" class="btn btn-success" id="confirm">Submit</button>'
         return context
     
     def post(self, request, *args, **kwargs):
         product_instance = self.get_object()  # Get the product instance based on pk in URL
+        # Get the warehouse instance from the URL parameters ('wh')
+        warehouse_instance = get_object_or_404(Warehouse, pk=self.kwargs.get('wh'))
+
+        # Check if the combination of warehouse and product already exists in the database
+        if WarehouseProduct.objects.filter(warehouse=warehouse_instance, product=product_instance).exists():
+            messages.error(self.request, 'This product is already registered in this warehouse.')
+            return redirect(self.request.META.get('HTTP_REFERER'))
 
         # Initialize the form with the POST data and product instance
-        form = WarehouseProductForm(request.POST, product_instance=product_instance)
+        form = WarehouseProductForm(request.POST, product_instance=product_instance, warehouse_instance=warehouse_instance)
 
         if form.is_valid():
             # Save the form and create the WarehouseProduct
             form.save()
+            messages.success(self.request, 'Operation was successful!')
+            return redirect(self.request.META.get('HTTP_REFERER'))
 
-            # Redirect to the success URL
-            return redirect(reverse_lazy('warehouse_list'))  # Adjust the success URL as needed
-
-        # If form is invalid, re-render the same page with form errors
+        # Re-render the form with the error messages
         return self.render_to_response(self.get_context_data(form=form))
-
-class ListInventoryWarehouse(TemplateView):
-    template_name = 'core/pages/inventory/view.html'

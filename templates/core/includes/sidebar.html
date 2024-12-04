@@ -60,25 +60,19 @@
             <ul class="nav nav-collapse">
               <li>
                 <a href="{% url 'warehouse_list' %}">
-                  <span class="sub-item">Warehouse</span>
+                  <span class="sub-item">Warehouses</span>
                 </a>
               </li>
               <li>
                 <a data-bs-toggle="collapse" href="#subnav1">
-                  <span class="sub-item">Product</span>
+                  <span class="sub-item">Products</span>
                   <span class="caret"></span>
                 </a>
                 <div class="collapse" id="subnav1">
                   <ul class="nav nav-collapse subnav">
                     <li>
                       <a href="{% url 'product_list' %}">
-                        <span class="sub-item">Master Product</span>
-                      </a>
-                    </li>
-
-                    <li>
-                      <a href="{% url 'warehouse_product_query' %}">
-                        <span class="sub-item">Assign Product to Warehouse</span>
+                        <span class="sub-item">Master Products</span>
                       </a>
                     </li>
 

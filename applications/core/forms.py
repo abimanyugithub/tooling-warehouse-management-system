@@ -286,36 +286,39 @@ class WarehouseProductSearchForm(forms.Form):
             field.widget.attrs.update({'autocomplete': 'off'})
 
 
-
 class WarehouseProductForm(forms.ModelForm):
     class Meta:
         model = WarehouseProduct
         fields = ['product', 'warehouse']  # The fields we want to include in the form
 
         widgets = {
-            'product': forms.Select(attrs={'class': 'form-control'}),  # We use HiddenInput so the user can't change it
-            'warehouse': forms.Select(attrs={'class': 'form-control form-select'}),
+            'product': forms.HiddenInput(),  # We use HiddenInput so the user can't change it
+            'warehouse': forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
         # Extract the product_instance from kwargs, passed in the view
         self.product_instance = kwargs.pop('product_instance', None)
+        self.warehouse_instance = kwargs.pop('warehouse_instance', None)
         super().__init__(*args, **kwargs)
 
         if self.product_instance:
-            # Set the product field to the passed product_instance (this will be pre-filled in the form)
             self.fields['product'].initial = self.product_instance
+        
+        if self.warehouse_instance:
+            self.fields['warehouse'].initial = self.warehouse_instance
+
 
     def save(self, commit=True):
         # Override the save method to explicitly assign the product
         warehouse_product = super().save(commit=False)
         warehouse_product.product = self.product_instance  # Assign the product instance passed from the view
+        warehouse_product.warehouse = self.warehouse_instance
 
         if commit:
             warehouse_product.save()
 
         return warehouse_product
-    
 
 
    

@@ -34,7 +34,6 @@ urlpatterns = [
     path('core/product/update/<uuid:pk>/', views.UpdateProduct.as_view(), name='product_update'),
     path('core/product/detail/<uuid:pk>/', views.DetailProduct.as_view(), name='product_detail'),
 
-    path('core/inventory/warehouse/', views.ListInventoryWarehouse.as_view(), name='inventory_wh_view'),
-    path('core/product/warehouse-product/search', views.WarehouseProductSearchView.as_view(), name='warehouse_product_query'),
-    path('core/product/warehouse-product/create/<uuid:pk>', views.CreateWarehouseProduct.as_view(), name='warehouse_product_create'),
+    path('inventory/warehouse-product/<uuid:wh>/', views.WarehouseProductSearchView.as_view(), name='warehouse_product_query'),
+    path('inventory/warehouse-product/<uuid:wh>/<uuid:pk>/', views.CreateWarehouseProduct.as_view(), name='warehouse_product_create'),
 ]

@@ -1,0 +1,56 @@
+{% extends 'core/layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- [ Main Content ] start -->
+<div class="page-header">
+    <h3 class="fw-bold mb-3">{{ title }}</h3>
+    <!-- [ breadcrumb ] start -->
+    {% block breadcrumbs %}
+        {% include 'core/includes/breadcrumb.html' %}
+    {% endblock breadcrumbs %}
+    <!-- [ breadcrumb ] end -->
+</div>
+
+<div class="row">
+    <div class="col-md-12"> 
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <h4 class="card-title">{{ subtitle }}</h4>
+                    <form id="post-form" class="ms-auto" method="post" action="{% url 'warehouse_delete' pk=item.id %}">
+                        {% csrf_token %}
+                        <button data-bs-toggle="tooltip" title="Move to trash" type="button" class="btn btn-danger btn-round" id="delete">
+                            <i class="icon-trash"></i></button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                    {% for field, value in dynamic_fields.items %}
+                        {% if forloop.counter0|divisibleby:7 and not forloop.first %}
+                            <!-- Start a new column for every second field -->
+                            </div>
+                            <div class="col-md-6">
+                        {% endif %}
+                        <div class="form-group">
+                            <div class="fw-bolder">{{ field|capfirst }}:</div>{{ value }}
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-action">
+                <form id="post-form" method="post" data-parsley-validate>
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    {{ button_submit|safe }}
+                    <button class="btn btn-primary" type="button" onclick="window.history.back();">Back</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- [ Main Content ] end -->
+{% endblock content %}

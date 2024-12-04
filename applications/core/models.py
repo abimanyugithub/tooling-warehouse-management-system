@@ -42,14 +42,6 @@ class Warehouse(models.Model):
     def restore(self):
         self.deleted_at = None  # Menghapus waktu penghapusan
         self.save()
-
-    @classmethod
-    def get_active(cls):
-        return cls.objects.filter(deleted_at__isnull=True)  # Hanya ambil item yang tidak memiliki waktu penghapusan
-
-    @classmethod
-    def get_trash(cls):
-        return cls.objects.filter(deleted_at__isnull=False)  # Hanya ambil item yang sudah dihapus
     
     class Meta:
         ordering = ['code']
@@ -137,3 +129,6 @@ class Product(models.Model):
 class WarehouseProduct(models.Model):
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True, blank=True) # Tracks soft delete timestamp

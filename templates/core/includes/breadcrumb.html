@@ -1,13 +1,19 @@
 {% load custom_filters %}
 <ul class="breadcrumbs mb-3">
   {% for breadcrumb in breadcrumb %}
-      {% if breadcrumb.url %}
-        <li class="nav-item"><a href="{% url breadcrumb.url %}">{{ breadcrumb.name }}</a></li>
-        <li class="separator">
-          <i class="icon-arrow-right"></i>
-        </li>
-      {% else %}
-      <li class="nav-item">{{ breadcrumb.name }}</li>
-      {% endif %}
-    {% endfor %}
+      <li class="nav-item">
+          {% if breadcrumb.url %}
+            <a href="{% url breadcrumb.url %}">{{ breadcrumb.name }}</a>
+          {% else %}
+            <a href="#">{{ breadcrumb.name }}</a>  <!-- Last breadcrumb or one without URL -->
+          {% endif %}
+
+          {% if not forloop.last %}
+            <li class="separator">
+              <i class="icon-arrow-right"></i>
+            </li>
+          {% endif %}
+      </li>
+  {% endfor %}
 </ul>
+
