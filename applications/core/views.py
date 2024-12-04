@@ -1,4 +1,5 @@
 import uuid
+from django import forms
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -26,10 +27,20 @@ class ListWarehouse(ListView):
     template_name = 'core/pages/warehouse/list.html'
     context_object_name = 'list_item'
     ordering = ['code']
+    paginate_by = 100
 
     def get_queryset(self):
-        # Filter untuk hanya menampilkan item yang belum dihapus
-        return Warehouse.objects.filter(deleted_at__isnull=True)
+        # Mendapatkan parameter 'status' dari query string
+        status = self.request.GET.get('status', 'published')  # Default ke 'published'
+
+        # Memfilter berdasarkan status
+        if status == 'published':
+            queryset = Warehouse.objects.filter(deleted_at__isnull=True)
+        elif status == 'trash':
+            queryset = Warehouse.objects.filter(deleted_at__isnull=False)
+        else:
+            queryset = Warehouse.objects.all()
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -40,7 +51,7 @@ class ListWarehouse(ListView):
             'zone': 'Area',
             'phone_number': 'Phone Number',
             'email': 'Email Address',
-            'manager': 'Manager'
+            'manager': 'Manager',
         }
         context['title'] = model_name_separated
         context['breadcrumb'] = [
@@ -48,7 +59,16 @@ class ListWarehouse(ListView):
             {'name': f'{model_name_separated}', 'url': 'warehouse_list'},
             {'name': 'List', 'url': None}  # No URL for the last breadcrumb item
         ]
+        # Menghitung jumlah warehouse yang sudah dihapus (soft delete)
+        deleted_count = Warehouse.objects.filter(deleted_at__isnull=False).count()
+        context['deleted_count'] = deleted_count
+        # Menghitung jumlah warehouse yang tidak dihapus (soft delete)
+        not_deleted_count = Warehouse.objects.filter(deleted_at__isnull=True).count()
+        context['not_deleted_count'] = not_deleted_count
+        # Menyertakan parameter status di context untuk menampilkan status yang dipilih
+        context['status'] = self.request.GET.get('status', 'published')  # Default 'published'
 
+        # context['card_sub'] = f'<div class="card-sub bg-transparent"><em>Note: The table displays only the first {self.paginate_by} records.</em></div>'
         return context
 
 class CreateWarehouse(CreateView):
@@ -151,6 +171,25 @@ class DetailWarehouse(DetailView):
         model_name_separated = get_separated_model_name(self.model.__name__)
         # Initialize the form and add it to the context
         form = WarehouseForm(instance=self.object)
+
+        # Manually add the 'created_at' field to the form and disable it
+        form.fields['created_at'] = forms.DateTimeField(
+            initial=self.object.created_at, 
+            widget=forms.DateTimeInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            required=False
+        )
+        form.fields['updated_at'] = forms.DateTimeField(
+            initial=self.object.updated_at, 
+            widget=forms.DateTimeInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            required=False
+        )
+
+        form.fields['deleted_at'] = forms.DateTimeField(
+            initial=self.object.deleted_at, 
+            widget=forms.DateTimeInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            required=False
+        )
+
         # Menonaktifkan setiap field dalam form
         for field in form.fields.values():
             field.disabled = True
@@ -587,6 +626,19 @@ class ListProduct(ListView):
     ordering = ['name']
     paginate_by = 100
 
+    def get_queryset(self):
+        # Mendapatkan parameter 'status' dari query string
+        status = self.request.GET.get('status', 'published')  # Default ke 'published'
+
+        # Memfilter berdasarkan status
+        if status == 'published':
+            queryset = Product.objects.filter(deleted_at__isnull=True)
+        elif status == 'trash':
+            queryset = Product.objects.filter(deleted_at__isnull=False)
+        else:
+            queryset = Product.objects.all()
+        return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         model_name_separated = get_separated_model_name(self.model.__name__)
@@ -605,6 +657,14 @@ class ListProduct(ListView):
             {'name': 'List', 'url': None}  # No URL for the last breadcrumb item
         ]
 
+        # Menghitung jumlah product yang sudah dihapus (soft delete)
+        deleted_count = Product.objects.filter(deleted_at__isnull=False).count()
+        context['deleted_count'] = deleted_count
+        # Menghitung jumlah product yang tidak dihapus (soft delete)
+        not_deleted_count = Product.objects.filter(deleted_at__isnull=True).count()
+        context['not_deleted_count'] = not_deleted_count
+        # Menyertakan parameter status di context untuk menampilkan status yang dipilih
+        context['status'] = self.request.GET.get('status', 'published')  # Default 'published'
         return context
 
 class CreateProduct(CreateView):
@@ -675,6 +735,23 @@ class DetailProduct(DetailView):
         model_name_separated = get_separated_model_name(self.model.__name__)
         # Initialize the form and add it to the context
         form = ProductForm(instance=self.object)
+        # Manually add the 'created_at' field to the form and disable it
+        form.fields['created_at'] = forms.DateTimeField(
+            initial=self.object.created_at, 
+            widget=forms.DateTimeInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            required=False
+        )
+        form.fields['updated_at'] = forms.DateTimeField(
+            initial=self.object.updated_at, 
+            widget=forms.DateTimeInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            required=False
+        )
+
+        form.fields['deleted_at'] = forms.DateTimeField(
+            initial=self.object.deleted_at, 
+            widget=forms.DateTimeInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            required=False
+        )
         # Menonaktifkan setiap field dalam form
         for field in form.fields.values():
             field.disabled = True
@@ -689,6 +766,15 @@ class DetailProduct(DetailView):
         
         return context
     
+class SoftDeleteProduct(View):
+    def post(self, request, pk):
+        item = get_object_or_404(Product, pk=pk)
+        item.soft_delete()  # Soft delete the item
+        messages.success(request, 'The item has been successfully deleted.')
+
+        return redirect('product_list')
+    
+    
 class WarehouseProductSearchView(ListView):
     model = Product
     template_name = 'core/pages/inventory/assign_warehouse/query.html'
@@ -697,11 +783,12 @@ class WarehouseProductSearchView(ListView):
     paginate_by = 100
     
     def get_queryset(self):
-        queryset = super().get_queryset()
-        query = self.request.GET.get('q')
-        if query:
+        # queryset = super().get_queryset()
+        queryset = Product.objects.filter(deleted_at__isnull=True)
+        search_term = self.request.GET.get('q')
+        if search_term:
            queryset = queryset.filter(
-                Q(name__icontains=query) | Q(sku__icontains=query)
+                Q(name__icontains=search_term) | Q(sku__icontains=search_term)
             )
         return queryset
     

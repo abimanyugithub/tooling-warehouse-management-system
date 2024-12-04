@@ -21,7 +21,7 @@ class WarehouseForm(forms.ModelForm):
             'village',
             'phone_number',
             'email',
-            'active'
+            # 'active'
         ]
 
         labels = {
@@ -36,7 +36,7 @@ class WarehouseForm(forms.ModelForm):
             'regency': 'Regency',
             'district': 'District',
             'village': 'Village',
-            'active':'Mark as active'
+            # 'active':'Mark as active'
         }
 
         help_texts = {
@@ -68,9 +68,11 @@ class WarehouseForm(forms.ModelForm):
             else:
                 field.widget.attrs.update({'class': 'form-control'})
 
+            '''
             if 'active' in self.fields:
                 # Set widget untuk 'active' (misalnya, mengubah checkbox menjadi readonly)
                 self.fields['active'].widget.attrs.update({'class': 'form-check form-check-input'})
+            '''
 
             if 'code' in self.fields:
                 # Menetapkan nilai acak untuk 'order_number' jika field tersebut ada

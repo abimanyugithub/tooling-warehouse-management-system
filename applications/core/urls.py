@@ -33,6 +33,8 @@ urlpatterns = [
     path('core/product/create/', views.CreateProduct.as_view(), name='product_create'),
     path('core/product/update/<uuid:pk>/', views.UpdateProduct.as_view(), name='product_update'),
     path('core/product/detail/<uuid:pk>/', views.DetailProduct.as_view(), name='product_detail'),
+    path('core/product/delete/<uuid:pk>/', views.SoftDeleteProduct.as_view(), name='product_delete'),
+
 
     path('inventory/warehouse-product/<uuid:wh>/', views.WarehouseProductSearchView.as_view(), name='warehouse_product_query'),
     path('inventory/warehouse-product/<uuid:wh>/<uuid:pk>/', views.CreateWarehouseProduct.as_view(), name='warehouse_product_create'),

@@ -4,7 +4,7 @@ from django.urls import reverse
 def navbar_context(request):
     list_inventory = []
 
-    list_warehouse = Warehouse.objects.filter(active=True, deleted_at__isnull=True).order_by('name')
+    list_warehouse = Warehouse.objects.filter(deleted_at__isnull=True).order_by('name')
 
     if not list_warehouse:
         list_inventory.append(
@@ -19,6 +19,7 @@ def navbar_context(request):
                 f'<span class="sub-item">{item.name}</span><span class="caret"></span></a>'
                 f'<div class="collapse" id="subnav{item.id}"><ul class="nav nav-collapse subnav">'
                 f'<li><a href="{warehouse_url}"><span class="sub-item">Assign Product to Warehouse</span></a></li>'
+                f'<li><a href="{warehouse_url}"><span class="sub-item">Stock Adjustment</span></a></li>'
                 f'</ul></div></li>'
             )
         

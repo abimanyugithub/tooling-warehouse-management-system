@@ -18,7 +18,7 @@ class Warehouse(models.Model):
     current_inventory = models.PositiveIntegerField(default=0)  # Jumlah inventaris saat ini
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    active = models.BooleanField(default=True)
+    # active = models.BooleanField(default=True)
     address_line1 = models.CharField(max_length=255, blank=True, null=True, verbose_name='Alamat Baris 1')
     address_line2 = models.CharField(max_length=255, blank=True, null=True, verbose_name='Alamat Baris 2')
     province = models.ForeignKey(Provinsi, on_delete=models.CASCADE, blank=True, null=True)
@@ -121,6 +121,14 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.sku} ({self.name})"
+    
+    def soft_delete(self):
+        self.deleted_at = timezone.now()  # Set waktu penghapusan
+        self.save()
+
+    def restore(self):
+        self.deleted_at = None  # Menghapus waktu penghapusan
+        self.save()
     
     class Meta:
         ordering = ['sku']

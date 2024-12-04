@@ -1,0 +1,11 @@
+
+<!-- Tombol untuk memilih Published atau Trash -->
+<div class="hstack gap-2 m-3">
+    <a href="?status=published" class="btn btn-round {% if status == 'published' %}btn-secondary active{% else %}btn-light{% endif %} ms-auto">
+        Published ({{ not_deleted_count }})
+    </a>
+    <!-- <div class="vr"></div> -->
+    <a href="?status=trash" class="btn btn-round {% if status == 'trash' %}btn-danger active{% else %}btn-light{% endif %}">
+        Trash ({{ deleted_count }})
+    </a>
+</div>
