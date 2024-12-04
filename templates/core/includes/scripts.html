@@ -135,6 +135,12 @@
     e.preventDefault();
     showSweetAlert('Are you sure?', 'This item will be moved to the trash.');
   });
+
+  // Restore action for #post-form (using same form)
+  $('#restore').click(function(e) {
+    e.preventDefault();
+    showSweetAlert('Are you sure?', 'Do you want to restore this item?');
+  });
 </script>
 <!-- end confirm SweetAlert -->
 

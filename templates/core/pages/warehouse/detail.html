@@ -24,8 +24,7 @@
                     </button>
                     <form id="post-form" method="post" action="{% url 'warehouse_delete' pk=item.id %}">
                         {% csrf_token %}
-                        <button data-bs-toggle="tooltip" title="Move to trash" type="button" class="btn btn-danger btn-round ms-auto" id="delete">
-                            <i class="icon-trash"></i></button>
+                        {{ button_delete|safe }}
                     </form>
                 </div>
             </div>

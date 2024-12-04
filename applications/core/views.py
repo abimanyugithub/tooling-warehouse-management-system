@@ -60,8 +60,11 @@ class ListWarehouse(ListView):
             {'name': 'List', 'url': None}  # No URL for the last breadcrumb item
         ]
         # Menghitung jumlah warehouse yang sudah dihapus (soft delete)
-        deleted_count = Warehouse.objects.filter(deleted_at__isnull=False).count()
-        context['deleted_count'] = deleted_count
+        deleted_count = Warehouse.objects.filter(deleted_at__isnull=False)
+        for item in context['list_item']:
+            context['class_color'] = 'table-danger' if item.deleted_at else ''
+        
+        context['deleted_count'] = deleted_count.count()
         # Menghitung jumlah warehouse yang tidak dihapus (soft delete)
         not_deleted_count = Warehouse.objects.filter(deleted_at__isnull=True).count()
         context['not_deleted_count'] = not_deleted_count
@@ -220,13 +223,22 @@ class DetailWarehouse(DetailView):
             context['villages'] = KelurahanDesa.objects.filter(kecamatan=obj.district)
         else:
             context['villages'] = KelurahanDesa.objects.none()
-        
+
+        if obj.deleted_at is None:
+            context['button_delete'] = f'<button data-bs-toggle="tooltip" title="Move to trash" type="button" class="btn btn-lg btn-danger btn-icon btn-round ms-auto" id="delete"><i class="fa fa-trash-alt"></i></button>'
+        else:
+            context['button_delete'] = f'<button data-bs-toggle="tooltip" title="Restore" type="button" class="btn btn-lg btn-secondary btn-icon btn-round ms-auto" id="restore"><i class="fas fa-undo-alt"></i></button>'
+
         return context
     
 class SoftDeleteWarehouse(View):
     def post(self, request, pk):
         item = get_object_or_404(Warehouse, pk=pk)
-        item.soft_delete()  # Soft delete the item
+
+        if item.deleted_at is None:
+            item.soft_delete()  # Soft delete the item
+        else:
+            item.restore()
         messages.success(request, 'The item has been successfully deleted.')
 
         return redirect('warehouse_list')
