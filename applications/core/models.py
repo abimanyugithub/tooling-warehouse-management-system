@@ -58,6 +58,14 @@ class ProductCategory(models.Model):
     def __str__(self):
         return self.name
     
+    def soft_delete(self):
+        self.deleted_at = timezone.now()  # Set waktu penghapusan
+        self.save()
+
+    def restore(self):
+        self.deleted_at = None  # Menghapus waktu penghapusan
+        self.save()
+
     class Meta:
         ordering = ['name']
 
@@ -74,6 +82,14 @@ class ProductUOM(models.Model):
     def __str__(self):
         return f"{self.code} ({self.name})"
     
+    def soft_delete(self):
+        self.deleted_at = timezone.now()  # Set waktu penghapusan
+        self.save()
+
+    def restore(self):
+        self.deleted_at = None  # Menghapus waktu penghapusan
+        self.save()
+    
     class Meta:
         ordering = ['code']
     
@@ -89,6 +105,14 @@ class ProductType(models.Model):
 
     def __str__(self):
         return f"{self.code} ({self.name})"
+    
+    def soft_delete(self):
+        self.deleted_at = timezone.now()  # Set waktu penghapusan
+        self.save()
+
+    def restore(self):
+        self.deleted_at = None  # Menghapus waktu penghapusan
+        self.save()
     
     class Meta:
         ordering = ['code']

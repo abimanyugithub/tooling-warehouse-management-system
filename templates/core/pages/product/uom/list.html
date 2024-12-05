@@ -29,7 +29,7 @@
                 <div class="table-responsive">
                     <table id="multi-filter-select" class="display table table-hover" >
                         <thead>
-                            <tr>
+                            <tr class="table-secondary">
                               <th class="mw-25">#</th>
                               {% for key, value in fields.items %}
                                 <th>{{ value }}</th>
@@ -46,7 +46,7 @@
                         </tfoot>
                         <tbody>
                             {% for item in list_item %}
-                            <tr class="pe-auto" onclick="window.location.href='{% url 'product_uom_detail' pk=item.id %}'" style="cursor: pointer;">
+                            <tr class="pe-auto {{ class_color }}" onclick="window.location.href='{% url 'product_uom_detail' pk=item.id %}'" style="cursor: pointer;">
                               <td>{{ forloop.counter }}</td>
                               {% for field in fields %}
                                 <td>{{ item|get_field_value:field }}</td>
@@ -58,6 +58,9 @@
                 </div>
             </div>
         </div>
+        {% block filter_buttons %}
+            {% include 'core/includes/filter_buttons.html' %}
+        {% endblock %}
     </div>
 </div>
 <!-- [ Main Content ] end -->

@@ -230,9 +230,6 @@ class ProductForm(forms.ModelForm):
             'sku': forms.TextInput(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control'}),
-            'product_type': forms.Select(attrs={'class': 'form-control'}),
-            'uom': forms.Select(attrs={'class': 'form-control'}),
-            'category': forms.Select(attrs={'class': 'form-control'}),
         }
 
         help_texts = {
@@ -251,6 +248,11 @@ class ProductForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Menetapkan queryset untuk category, product_type, dan uom berdasarkan kondisi
+        self.fields['category'].queryset = ProductCategory.objects.filter(deleted_at__isnull=True) 
+        self.fields['product_type'].queryset = ProductType.objects.filter(deleted_at__isnull=True) 
+        self.fields['uom'].queryset = ProductUOM.objects.filter(deleted_at__isnull=True)
+        
         # Iterate through each field and set widget attributes
         for field_name, field in self.fields.items():
         

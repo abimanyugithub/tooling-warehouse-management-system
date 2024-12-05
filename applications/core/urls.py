@@ -14,21 +14,29 @@ urlpatterns = [
     path('core/warehouse/delete/<uuid:pk>/', views.SoftDeleteWarehouse.as_view(), name='warehouse_delete'),
 
     # path('core/product/category/list', views.ViewProductCategory.as_view(), name='product_category_list'),
+
+    # category
     path('core/product/category/list/', views.ListProductCategory.as_view(), name='product_category_list'),
     path('core/product/category/create/', views.CreateProductCategory.as_view(), name='product_category_create'),
     path('core/product/category/update/<uuid:pk>/', views.UpdateProductCategory.as_view(), name='product_category_update'),
     path('core/product/category/detail/<uuid:pk>/', views.DetailProductCategory.as_view(), name='product_category_detail'),
+    path('core/product/category/delete/<uuid:pk>/', views.SoftDeleteProductCategory.as_view(), name='product_category_delete'),
 
+    # UOM
     path('core/product/uom/list/', views.ListProductUOM.as_view(), name='product_uom_list'),
     path('core/product/uom/create/', views.CreateProductUOM.as_view(), name='product_uom_create'),
     path('core/product/uom/update/<uuid:pk>/', views.UpdateProductUOM.as_view(), name='product_uom_update'),
     path('core/product/uom/detail/<uuid:pk>/', views.DetailProductUOM.as_view(), name='product_uom_detail'),
+    path('core/product/uom/delete/<uuid:pk>/', views.SoftDeleteProductUOM.as_view(), name='product_uom_delete'),
 
+    # type
     path('core/product/type/list/', views.ListProductType.as_view(), name='product_type_list'),
     path('core/product/type/create/', views.CreateProductType.as_view(), name='product_type_create'),
     path('core/product/type/detail/<uuid:pk>/', views.DetailProductType.as_view(), name='product_type_detail'),
     path('core/product/type/update/<uuid:pk>/', views.UpdateProductType.as_view(), name='product_type_update'),
+    path('core/product/type/delete/<uuid:pk>/', views.SoftDeleteProductType.as_view(), name='product_type_delete'),
 
+    # product
     path('core/product/list/', views.ListProduct.as_view(), name='product_list'),
     path('core/product/create/', views.CreateProduct.as_view(), name='product_create'),
     path('core/product/update/<uuid:pk>/', views.UpdateProduct.as_view(), name='product_update'),
