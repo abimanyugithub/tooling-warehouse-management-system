@@ -13,7 +13,7 @@ def navbar_context(request):
     else:
         # Loop through each warehouse and build the HTML structure
         for item in list_warehouse:
-            warehouse_url = reverse("warehouse_product_query", kwargs={'wh': item.id})
+            warehouse_url = reverse("warehouse_product_list", kwargs={'wh': item.id})
             list_inventory.append(
                 f'<li><a data-bs-toggle="collapse" href="#subnav{item.id}">'
                 f'<span class="sub-item">{item.name}</span><span class="caret"></span></a>'

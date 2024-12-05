@@ -12,6 +12,7 @@ from .forms import WarehouseForm, ProductCategoryForm, ProductUOMForm, ProductTy
 from .forms import WarehouseProductSearchForm, WarehouseProductForm
 import re
 from django.contrib import messages
+from django.forms.widgets import TextInput, Select
 
 
 def get_kabupaten_kota(request):
@@ -753,7 +754,6 @@ class ListProduct(ListView):
     template_name = 'core/pages/product/list.html'
     context_object_name = 'list_item'
     ordering = ['name']
-    paginate_by = 100
 
     def get_queryset(self):
         # Mendapatkan parameter 'status' dari query string
@@ -898,28 +898,112 @@ class SoftDeleteProduct(View):
         messages.success(request, 'The item has been successfully deleted.')
 
         return redirect('product_list')
+
+class ListWarehouseProduct(ListView):
+    model = WarehouseProduct
+    template_name = 'core/pages/inventory/assign_warehouse/list.html'
+    context_object_name = 'list_item'
+    ordering = ['name']
     
+    def get_queryset(self):
+        warehouse_uuid = self.kwargs['wh']
+        # Mendapatkan warehouse berdasarkan UUID
+        warehouse = get_object_or_404(Warehouse, id=warehouse_uuid)
+        queryset = self.model.objects.filter(warehouse=warehouse)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        warehouse_uuid = self.kwargs['wh']
+        # Mendapatkan warehouse berdasarkan UUID
+        warehouse = get_object_or_404(Warehouse, id=warehouse_uuid)
+        # model_name_separated = get_separated_model_name(self.model.__name__)
     
+        context['fields'] = {
+            'warehouse': 'Warehouse',
+            'product': 'Product',
+        }
+
+        context['title'] = f'Assign Product'
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': 'Assign Product', 'url': None},
+            {'name': 'List', 'url': None}  # No URL for the last breadcrumb item
+        ]
+
+        # Mengambil list_item dari context yang sudah disediakan oleh ListView
+        for item in context['list_item']:
+            context['class_color'] = 'table-danger' if item.deleted_at else ''
+            
+        # Menghitung jumlah product yang sudah dihapus (soft delete)
+        deleted_count = self.model.objects.filter(warehouse=warehouse, deleted_at__isnull=False).count()
+        context['deleted_count'] = deleted_count
+        # Menghitung jumlah product yang tidak dihapus (soft delete)
+        not_deleted_count = self.model.objects.filter(warehouse=warehouse, deleted_at__isnull=True).count()
+        context['not_deleted_count'] = not_deleted_count
+        # Menggunakan fungsi pembantu untuk mendapatkan status
+        context['status'] = get_status(self.request)
+
+        context['warehouse_id'] = warehouse.id
+        return context
+
+class DetailWarehouseProduct(DetailView):
+    model = WarehouseProduct
+    template_name = 'core/pages/inventory/assign_warehouse/detail.html'
+    context_object_name = 'item'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # model_name_separated = get_separated_model_name(self.model.__name__)
+        
+        # Inisialisasi form dengan instance objek yang sedang ditampilkan
+        form = WarehouseProductForm(instance=self.object)
+        
+        # Menggunakan fungsi pembantu untuk menambahkan field 'created_at', 'updated_at', 'deleted_at'
+        update_form = add_datetime_fields_to_form(form, self.object)
+
+        form.fields['warehouse'].widget = TextInput(attrs={'class': 'form-control'})
+        form.fields['product'].widget = TextInput(attrs={'class': 'form-control'})
+        
+        # Menonaktifkan setiap field dalam form
+        for field in update_form.fields.values():
+            field.disabled = True
+        
+        context['form'] = update_form
+
+        context['title'] = f'Assign Product'
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': 'dashboard_view'},
+            {'name': f'Assign Product', 'url': 'product_list'},
+            {'name': 'Detail', 'url': None}  # No URL for the last breadcrumb item
+        ]
+
+        # Menggunakan fungsi pembantu untuk mendapatkan HTML tombol
+        context['button_delete'] = get_delete_restore_button(self.object)
+        
+        return context
+    
+
+
+
+
+
 class WarehouseProductSearchView(ListView):
     model = Product
     template_name = 'core/pages/inventory/assign_warehouse/query.html'
     context_object_name = 'list_item'
     form_class = WarehouseProductSearchForm
-    paginate_by = 100
     
     def get_queryset(self):
-        # queryset = super().get_queryset()
-        queryset = Product.objects.filter(deleted_at__isnull=True)
+        queryset = super().get_queryset()
         search_term = self.request.GET.get('q')
         if search_term:
-           queryset = queryset.filter(
-                Q(name__icontains=search_term) | Q(sku__icontains=search_term)
-            )
+           queryset = queryset.filter(Q(name__icontains=search_term) | Q(sku__icontains=search_term), deleted_at__isnull=True)
         return queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        warehouse_instance = get_object_or_404(Warehouse, pk=self.kwargs.get('wh'))
+        warehouse = get_object_or_404(Warehouse, pk=self.kwargs.get('wh'))
         context['form'] = self.form_class(self.request.GET)
         context['query'] = self.request.GET.get('q', '')
         context['fields'] = {
@@ -935,11 +1019,11 @@ class WarehouseProductSearchView(ListView):
             {'name': 'Home', 'url': 'dashboard_view'},
             # {'name': 'Assign Product', 'url': reverse ('warehouse_product_query', kwargs={'wh': warehouse_instance.id})},
             {'name': 'Assign Product', 'url': None},
-            {'name': f'Register to {warehouse_instance}', 'url': None}
+            {'name': f'Register to {warehouse}', 'url': None}
         ]
 
         context['subtitle'] = 'Register'
-        context['warehouse_id'] = warehouse_instance.id
+        context['warehouse_id'] = warehouse.id
         return context
     
 class CreateWarehouseProduct(DetailView):
@@ -951,27 +1035,27 @@ class CreateWarehouseProduct(DetailView):
         context = super().get_context_data(**kwargs)
         
         # Fetch the product instance based on the pk in the URL
-        product_instance = self.get_object()
+        product = self.get_object()
         # Get the warehouse instance from the URL parameters ('wh')
-        warehouse_instance = get_object_or_404(Warehouse, pk=self.kwargs.get('wh'))
+        warehouse = get_object_or_404(Warehouse, pk=self.kwargs.get('wh'))
         
         # Initialize the form and pass the product instance to it
-        form = WarehouseProductForm(self.request.GET or None, product_instance=product_instance, warehouse_instance=warehouse_instance)
+        form = WarehouseProductForm(self.request.GET or None, product_instance=product, warehouse_instance=warehouse)
         context['form'] = form
         context['title'] = 'Assign Product'
         context['breadcrumb'] = [
             {'name': 'Home', 'url': 'dashboard_view'},
             # {'name': 'Assign Product', 'url': 'warehouse_product_query'},
             {'name': 'Assign Product', 'url': None},
-            {'name': f'Register to {warehouse_instance}', 'url': None}
+            {'name': f'Register to {warehouse}', 'url': None}
         ]
         
         context['subtitle'] = 'Register'
-        status = WarehouseProduct.objects.filter(product=product_instance, warehouse=warehouse_instance)
+        status = WarehouseProduct.objects.filter(product=product, warehouse=warehouse)
         # Show only certain fields for regular users
         dynamic_fields = {
             'Status': f'Registered' if status.exists() else 'Not registered.',
-            'Warehouse': f'{warehouse_instance}' if status.exists() else '--',
+            'Warehouse': f'{warehouse}' if status.exists() else '--',
             'Registered Date': status.first().created_at.strftime('%d/%m/%Y %H:%M') if status.exists() and status.first().created_at else '--',
             'Product No': self.object.sku,
             'Product Name': self.object.name,
@@ -982,6 +1066,9 @@ class CreateWarehouseProduct(DetailView):
 
         context['dynamic_fields'] = dynamic_fields
         context['button_submit'] = f'<button type="button" class="btn btn-success" id="confirm">Submit</button>'
+
+        # Menggunakan fungsi pembantu untuk mendapatkan HTML tombol
+        context['button_delete'] = get_delete_restore_button(self.object)
         return context
     
     def post(self, request, *args, **kwargs):

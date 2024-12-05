@@ -7,6 +7,8 @@ urlpatterns = [
     path('kelurahan-desa/', views.get_kelurahan_desa, name='get_kelurahan_desa'),
 
     path('', views.DashboardView.as_view(), name='dashboard_view'),
+
+    # category
     path('core/warehouse/create/', views.CreateWarehouse.as_view(), name='warehouse_create'),
     path('core/warehouse/update/<uuid:pk>/', views.UpdateWarehouse.as_view(), name='warehouse_update'),
     path('core/warehouse/list/', views.ListWarehouse.as_view(), name='warehouse_list'),
@@ -43,7 +45,11 @@ urlpatterns = [
     path('core/product/detail/<uuid:pk>/', views.DetailProduct.as_view(), name='product_detail'),
     path('core/product/delete/<uuid:pk>/', views.SoftDeleteProduct.as_view(), name='product_delete'),
 
+    # assign product to warehouse
+    path('inventory/warehouse-product/list/<uuid:wh>/', views.ListWarehouseProduct.as_view(), name='warehouse_product_list'),
+    path('inventory/warehouse-product/detail/<uuid:wh>/<uuid:pk>/', views.DetailWarehouseProduct.as_view(), name='warehouse_product_detail'),
 
     path('inventory/warehouse-product/<uuid:wh>/', views.WarehouseProductSearchView.as_view(), name='warehouse_product_query'),
     path('inventory/warehouse-product/<uuid:wh>/<uuid:pk>/', views.CreateWarehouseProduct.as_view(), name='warehouse_product_create'),
+    
 ]

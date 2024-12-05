@@ -1,6 +1,7 @@
 {% extends 'core/layouts/base.html' %}
 {% load static custom_filters %}
 
+
 {% block content %}
 <!-- [ Main Content ] start -->
 <div class="page-header">
@@ -12,51 +13,16 @@
     <!-- [ breadcrumb ] end -->
 </div>
 
-
-<div class="row">
-    <div class="col-md-12"> 
-        <div class="card">
-            <div class="card-header">
-                <div class="d-flex align-items-center">
-                    <h4 class="card-title">{{ subtitle }}</h4>
-                </div>
-            </div>
-            <form id="post-form" method="get" data-parsley-validate>
-                <div class="card-body">
-                    {% for field in form %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        <div class="input-icon">
-                            <!-- Render the search input field -->
-                            {{ field }}  <!-- This will render the <input> field with the 'form-control' class and 'placeholder' -->
-                            <span class="input-icon-addon">
-                                <i class="fa fa-search"></i> <!-- Font Awesome search icon -->
-                            </span>
-                        </div>
-
-                        {% if field.help_text %}
-                            <small class="form-text text-muted">{{ field.help_text }}</small>
-                        {% endif %}
-                    </div>
-                    {% endfor %} 
-                </div>
-                <div class="card-action">
-                    <button type="submit" class="btn btn-success">Query</button>
-                    <button class="btn btn-primary" type="button" onclick="window.history.back();">Back</button>
-                    
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-{% if query %}
 <div class="row">
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
                 <div class="d-flex align-items-center">
-                    <h4 class="card-title">Result</h4>
+                    <h4 class="card-title">List</h4>
+                    <button class="btn btn-primary btn-round ms-auto" onclick="window.location.href='{% url 'warehouse_product_query' wh=warehouse_id %}'">
+                        <i class="fa fa-plus"></i>
+                        Register
+                    </button>
                 </div>
             </div>
             <div class="card-body">
@@ -80,7 +46,7 @@
                         </tfoot>
                         <tbody>
                             {% for item in list_item %}
-                            <tr class="pe-auto" onclick="window.location.href='{% url 'warehouse_product_create' wh=warehouse_id pk=item.id %}'" style="cursor: pointer;">
+                            <tr class="pe-auto {{ class_color }}" onclick="window.location.href='{% url 'warehouse_product_detail' wh=warehouse_id pk=item.id %}'" style="cursor: pointer;">
                               <td>{{ forloop.counter }}</td>
                               {% for field in fields %}
                                 <td>{{ item|get_field_value:field }}</td>
@@ -92,9 +58,10 @@
                 </div>
             </div>
         </div>
+        {% block filter_buttons %}
+            {% include 'core/includes/filter_buttons.html' %}
+        {% endblock %}
     </div>
 </div>
-{% endif %}
-
 <!-- [ Main Content ] end -->
 {% endblock content %}

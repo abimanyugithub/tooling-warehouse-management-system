@@ -17,33 +17,37 @@
         <div class="card">
             <div class="card-header">
                 <div class="d-flex align-items-center">
-                    <h4 class="card-title">{{ subtitle }}</h4>
-                   
+                    <h4 class="card-title">Detail</h4>
+                    <button class="btn btn-primary btn-round ms-auto me-1" onclick="window.location.href='{% url 'product_create' %}'">
+                        <i class="fa fa-plus"></i>
+                        Register
+                    </button>
+                    <form id="post-form" method="post" action="">
+                        {% csrf_token %}
+                        {{ button_delete|safe }}
+                    </form>
                 </div>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                    {% for field, value in dynamic_fields.items %}
+                    {% for field in form %}
                         {% if forloop.counter0|divisibleby:7 and not forloop.first %}
                             <!-- Start a new column for every second field -->
                             </div>
                             <div class="col-md-6">
                         {% endif %}
                         <div class="form-group">
-                            <div class="fw-bolder">{{ field|capfirst }}:</div>{{ value }}
+                        {{ field.label_tag }}
+                        {{ field }}
                         </div>
                     {% endfor %}
                     </div>
                 </div>
             </div>
             <div class="card-action">
-                <form id="post-form" method="post" data-parsley-validate>
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    {{ button_submit|safe }}
-                    <button class="btn btn-primary" type="button" onclick="window.history.back();">Back</button>
-                </form>
+                <button class="btn btn-warning" onclick="window.location.href=''">Edit</button>
+                <button class="btn btn-primary" type="button" onclick="window.history.back();">Back</button>
             </div>
         </div>
     </div>
