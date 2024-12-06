@@ -14,12 +14,14 @@ def navbar_context(request):
         # Loop through each warehouse and build the HTML structure
         for item in list_warehouse:
             warehouse_url = reverse("warehouse_product_list", kwargs={'wh': item.id})
+            adjustment_url = reverse("stock_adjustment_create", kwargs={'wh': item.id})
+
             list_inventory.append(
                 f'<li><a data-bs-toggle="collapse" href="#subnav{item.id}">'
                 f'<span class="sub-item">{item.name}</span><span class="caret"></span></a>'
                 f'<div class="collapse" id="subnav{item.id}"><ul class="nav nav-collapse subnav">'
                 f'<li><a href="{warehouse_url}"><span class="sub-item">Assign Product to Warehouse</span></a></li>'
-                f'<li><a href="{warehouse_url}"><span class="sub-item">Stock Adjustment</span></a></li>'
+                f'<li><a href="{adjustment_url}"><span class="sub-item">Stock Adjustment</span></a></li>'
                 f'</ul></div></li>'
             )
         

@@ -173,3 +173,47 @@ class WarehouseProduct(models.Model):
     def restore(self):
         self.deleted_at = None  # Menghapus waktu penghapusan
         self.save()
+
+
+class WarehouseStockProduct(models.Model):
+    warehouse = models.ForeignKey(Warehouse, related_name='stocks', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='stocks', on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=0)  # Menyimpan jumlah stok untuk setiap produk di warehouse
+    
+    def __str__(self):
+        return f"Stock for {self.product.name} at {self.warehouse.name} - {self.quantity} units"
+
+
+class StockAdjustment(models.Model):
+    ADJUSTMENT_CHOICES = (
+        ('increase', 'Increase'),
+        ('decrease', 'Decrease'),
+    )
+    
+    warehouse = models.ForeignKey(Warehouse, related_name='adjustments', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='adjustments', on_delete=models.CASCADE)
+    adjustment_type = models.CharField(max_length=10, choices=ADJUSTMENT_CHOICES)
+    quantity = models.IntegerField()  # Jumlah perubahan stok (positif atau negatif)
+    reason = models.TextField(null=True, blank=True)  # Alasan penyesuaian stok (misalnya pengembalian, kerusakan)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    def save(self, *args, **kwargs):
+        # Mengambil stok produk yang bersangkutan di warehouse yang sesuai
+        stock = WarehouseStockProduct.objects.get(warehouse=self.warehouse, product=self.product)
+        
+        # Saat penyesuaian stok dilakukan, update stok terkait
+        if self.adjustment_type == 'increase':
+            stock.quantity += self.quantity
+        elif self.adjustment_type == 'decrease':
+            stock.quantity -= self.quantity
+        
+        # Pastikan jumlah stok tidak kurang dari 0
+        stock.quantity = max(stock.quantity, 0)
+        
+        stock.save()  # Simpan stok yang telah diupdate
+        
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.adjustment_type.capitalize()} {self.quantity} units of {self.product.name} in {self.warehouse.name} for {self.reason}"
+

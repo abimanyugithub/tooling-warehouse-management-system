@@ -6,10 +6,11 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, TemplateView, ListView, UpdateView, DetailView, View, FormView
 from .models import Warehouse, KabupatenKota, Kecamatan, KelurahanDesa
 from .models import ProductCategory, ProductUOM, ProductType, Product, WarehouseProduct
+from .models import StockAdjustment
 from django.db.models import Q
 
 from .forms import WarehouseForm, ProductCategoryForm, ProductUOMForm, ProductTypeForm, ProductForm
-from .forms import WarehouseProductSearchForm, WarehouseProductForm
+from .forms import WarehouseProductSearchForm, WarehouseProductForm, StockAdjustmentForm
 import re
 from django.contrib import messages
 from django.forms import TextInput, Select
@@ -1160,3 +1161,32 @@ class SoftWarehouseProduct(View):
         messages.success(request, 'The item has been successfully deleted.')
 
         return redirect('warehouse_product_list', wh=item.warehouse.id)
+    
+class CreateStockAdjustment(CreateView):
+    template_name = 'core/pages/inventory/stock_adjustment/create.html'
+    model = StockAdjustment
+    form_class = StockAdjustmentForm
+    success_message = "Stock adjustment successfully made."
+
+    def get_context_data(self, **kwargs):
+        # Get the context data from ListView (for the book list)
+        context = super().get_context_data(**kwargs)
+        warehouse_uuid = self.kwargs['wh']
+        model_name_separated = get_separated_model_name(self.model.__name__)
+        context['title'] = model_name_separated
+        context['breadcrumb'] = [
+            {'name': 'Home', 'url': reverse('dashboard_view')},
+            {'name': f'{model_name_separated}', 'url': reverse('stock_adjustment_create', kwargs={'wh': warehouse_uuid})},
+            {'name': 'Register', 'url': None}  # No URL for the last breadcrumb item
+        ]
+        
+        context['subtitle'] = 'Register'
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, self.success_message)
+        return response
+
+    def get_success_url(self):
+        return reverse_lazy('stock_adjustment_list')

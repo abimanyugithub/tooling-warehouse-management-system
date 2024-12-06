@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from .models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa
 from .models import Warehouse, ProductCategory, ProductUOM, ProductType, Product, WarehouseProduct
+from .models import StockAdjustment
 import random
 
 class WarehouseForm(forms.ModelForm):
@@ -298,7 +299,7 @@ class WarehouseProductForm(forms.ModelForm):
             'product': forms.HiddenInput(),  # We use HiddenInput so the user can't change it
             'warehouse': forms.HiddenInput(),
         }
-        
+
         '''
         widgets = {
             'product': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),  # We use HiddenInput so the user can't change it
@@ -328,6 +329,33 @@ class WarehouseProductForm(forms.ModelForm):
             warehouse_product.save()
 
         return warehouse_product
+    
+class StockAdjustmentForm(forms.ModelForm):
+    class Meta:
+        model = StockAdjustment
+        fields = ['warehouse', 'product', 'adjustment_type', 'quantity', 'reason']
+        widgets = {
+            'warehouse': forms.Select(attrs={'class': 'form-control form-select'}),
+            'product': forms.Select(attrs={'class': 'form-control form-select'}),
+            'adjustment_type': forms.Select(attrs={'class': 'form-control form-select'}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
+            'reason': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
+        # Adding help text to the form fields
+        help_texts = {
+            'warehouse': 'Select the warehouse where the product is stored.',
+            'product': 'Choose the product you are adjusting.',
+            'adjustment_type': 'Select whether you are increasing or decreasing the stock.',
+            'quantity': 'Enter the number of units to add or remove.',
+            'reason': 'Provide a reason for the stock adjustment (e.g., damage, restocking, etc.).',
+        }
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data.get('quantity')
+        if quantity <= 0:
+            raise forms.ValidationError("Quantity must be greater than zero.")
+        return quantity
 
 
    
