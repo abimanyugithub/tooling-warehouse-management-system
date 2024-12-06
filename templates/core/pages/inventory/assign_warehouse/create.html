@@ -18,20 +18,20 @@
             <div class="card-header">
                 <div class="d-flex align-items-center">
                     <h4 class="card-title">{{ subtitle }}</h4>
-                   
                 </div>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                    {% for field, value in dynamic_fields.items %}
+                    {% for key, value in fields.items %}
                         {% if forloop.counter0|divisibleby:7 and not forloop.first %}
                             <!-- Start a new column for every second field -->
                             </div>
                             <div class="col-md-6">
                         {% endif %}
                         <div class="form-group">
-                            <div class="fw-bolder">{{ field|capfirst }}:</div>{{ value }}
+                            <label for="{{ key }}">{{ key }}</label>
+                            <input class="form-control" value="{{ value }}" id="{{ key }}"readonly>
                         </div>
                     {% endfor %}
                     </div>
@@ -48,5 +48,6 @@
         </div>
     </div>
 </div>
+
 <!-- [ Main Content ] end -->
 {% endblock content %}

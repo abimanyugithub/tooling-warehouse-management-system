@@ -1,4 +1,5 @@
 from django import forms
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from .models import Provinsi, KabupatenKota, Kecamatan, KelurahanDesa
 from .models import Warehouse, ProductCategory, ProductUOM, ProductType, Product, WarehouseProduct
@@ -265,13 +266,12 @@ class ProductForm(forms.ModelForm):
             if 'sku' in self.fields:
                 # Menetapkan nilai acak untuk 'order_number' jika field tersebut ada
                 # Membuat SKU dengan panjang acak antara 2 hingga 7 digit
-                length = random.randint(2, 7)  # Menentukan panjang antara 2 dan 7 digit
+                length = random.randint(3, 7)  # Menentukan panjang antara 2 dan 7 digit
                 
                 self.fields['sku'].initial = f"{random.randint(10**(length-1), 10**length - 1)}"
 
             # Optionally, add other attributes like autocomplete="off"
             field.widget.attrs.update({'autocomplete': 'off'})
-
 
 class WarehouseProductSearchForm(forms.Form):
     q = forms.CharField(
@@ -289,7 +289,6 @@ class WarehouseProductSearchForm(forms.Form):
         for field_name, field in self.fields.items():
             field.widget.attrs.update({'autocomplete': 'off'})
 
-
 class WarehouseProductForm(forms.ModelForm):
     class Meta:
         model = WarehouseProduct
@@ -299,6 +298,13 @@ class WarehouseProductForm(forms.ModelForm):
             'product': forms.HiddenInput(),  # We use HiddenInput so the user can't change it
             'warehouse': forms.HiddenInput(),
         }
+        
+        '''
+        widgets = {
+            'product': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),  # We use HiddenInput so the user can't change it
+            'warehouse': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+        }
+        '''
 
     def __init__(self, *args, **kwargs):
         # Extract the product_instance from kwargs, passed in the view
@@ -307,11 +313,10 @@ class WarehouseProductForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.product_instance:
-            self.fields['product'].initial = self.product_instance
-        
+            self.fields['product'].initial = str(self.product_instance)
+            
         if self.warehouse_instance:
-            self.fields['warehouse'].initial = self.warehouse_instance
-
+            self.fields['warehouse'].initial = str(self.warehouse_instance)
 
     def save(self, commit=True):
         # Override the save method to explicitly assign the product

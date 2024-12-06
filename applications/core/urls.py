@@ -47,9 +47,8 @@ urlpatterns = [
 
     # assign product to warehouse
     path('inventory/warehouse-product/list/<uuid:wh>/', views.ListWarehouseProduct.as_view(), name='warehouse_product_list'),
-    path('inventory/warehouse-product/detail/<uuid:wh>/<uuid:pk>/', views.DetailWarehouseProduct.as_view(), name='warehouse_product_detail'),
-
-    path('inventory/warehouse-product/<uuid:wh>/', views.WarehouseProductSearchView.as_view(), name='warehouse_product_query'),
-    path('inventory/warehouse-product/<uuid:wh>/<uuid:pk>/', views.CreateWarehouseProduct.as_view(), name='warehouse_product_create'),
-    
+    path('inventory/warehouse-product/<uuid:wh>/', views.QueryWarehouseProduct.as_view(), name='warehouse_product_query'),
+    path('inventory/warehouse-product/create/<uuid:wh>/<uuid:prd>/', views.CreateWarehouseProduct.as_view(), name='warehouse_product_create'),
+    path('inventory/warehouse-product/detail/<uuid:pk>/', views.DetailWarehouseProduct.as_view(), name='warehouse_product_detail'),
+    path('inventory/warehouse-product/delete/<uuid:pk>/', views.SoftWarehouseProduct.as_view(), name='warehouse_product_delete'),
 ]

@@ -165,3 +165,11 @@ class WarehouseProduct(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True) # Tracks soft delete timestamp
+
+    def soft_delete(self):
+        self.deleted_at = timezone.now()  # Set waktu penghapusan
+        self.save()
+
+    def restore(self):
+        self.deleted_at = None  # Menghapus waktu penghapusan
+        self.save()

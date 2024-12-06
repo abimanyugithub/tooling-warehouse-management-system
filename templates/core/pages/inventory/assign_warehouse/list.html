@@ -46,7 +46,7 @@
                         </tfoot>
                         <tbody>
                             {% for item in list_item %}
-                            <tr class="pe-auto {{ class_color }}" onclick="window.location.href='{% url 'warehouse_product_detail' wh=warehouse_id pk=item.id %}'" style="cursor: pointer;">
+                            <tr class="pe-auto {{ class_color }}" onclick="window.location.href='{% url 'warehouse_product_detail' pk=item.id %}'" style="cursor: pointer;">
                               <td>{{ forloop.counter }}</td>
                               {% for field in fields %}
                                 <td>{{ item|get_field_value:field }}</td>

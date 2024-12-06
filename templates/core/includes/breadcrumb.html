@@ -3,7 +3,7 @@
   {% for breadcrumb in breadcrumb %}
       <li class="nav-item">
           {% if breadcrumb.url %}
-            <a href="{% url breadcrumb.url %}">{{ breadcrumb.name }}</a>
+            <a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>
           {% else %}
             <a href="#">{{ breadcrumb.name }}</a>  <!-- Last breadcrumb or one without URL -->
           {% endif %}

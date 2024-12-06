@@ -18,11 +18,11 @@
             <div class="card-header">
                 <div class="d-flex align-items-center">
                     <h4 class="card-title">Detail</h4>
-                    <button class="btn btn-primary btn-round ms-auto me-1" onclick="window.location.href='{% url 'product_create' %}'">
+                    <button class="btn btn-primary btn-round ms-auto me-1" onclick="window.location.href='{% url 'warehouse_product_query' wh=warehouse_id %}'">
                         <i class="fa fa-plus"></i>
                         Register
                     </button>
-                    <form id="post-form" method="post" action="">
+                    <form id="post-form" method="post" action="{% url 'warehouse_product_delete' pk=item.id %}">
                         {% csrf_token %}
                         {{ button_delete|safe }}
                     </form>
@@ -46,7 +46,6 @@
                 </div>
             </div>
             <div class="card-action">
-                <button class="btn btn-warning" onclick="window.location.href=''">Edit</button>
                 <button class="btn btn-primary" type="button" onclick="window.history.back();">Back</button>
             </div>
         </div>

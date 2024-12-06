@@ -43,14 +43,13 @@
                 <div class="card-action">
                     <button type="submit" class="btn btn-success">Query</button>
                     <button class="btn btn-primary" type="button" onclick="window.history.back();">Back</button>
-                    
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-{% if query %}
+{% if list_item %}
 <div class="row">
     <div class="col-md-12">
         <div class="card">
@@ -80,7 +79,7 @@
                         </tfoot>
                         <tbody>
                             {% for item in list_item %}
-                            <tr class="pe-auto" onclick="window.location.href='{% url 'warehouse_product_create' wh=warehouse_id pk=item.id %}'" style="cursor: pointer;">
+                            <tr class="pe-auto" onclick="window.location.href='{% url 'warehouse_product_create' wh=warehouse_id prd=item.id %}'" style="cursor: pointer;">
                               <td>{{ forloop.counter }}</td>
                               {% for field in fields %}
                                 <td>{{ item|get_field_value:field }}</td>
